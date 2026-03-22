@@ -1,6 +1,6 @@
 # Praćtica 1 - Control de calidad de una aplicación web 
 
-**Grupo X**
+**Grupo Z**
 
 ## Miembros del Equipo
 | Nombre y Apellidos | Correo URJC | Usuario GitHub |
@@ -53,4 +53,3 @@
 |4| [Caso de TDD implementado](URL_commit_4)  |
 |5| [Prueba de sistema implementada](URL_commit_5)  |
 
----
