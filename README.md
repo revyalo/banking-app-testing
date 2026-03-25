@@ -19,7 +19,7 @@
 
 | Nº    | Commits      |
 |:------------: |:------------:|
-|1| [Issue detectada](URL_commit_1)  |
+|1| [Issue detectada](https://github.com/revyalo/ais-2026-grupo-z/commit/a9dfde9ae07436ce59379877ae1740aa405bd84a)|
 |2| [Prueba unitaria implementada](URL_commit_2)  |
 |3| [Refactorización implementada](URL_commit_3)  |
 |4| [Caso de TDD implementado](URL_commit_4)  |
