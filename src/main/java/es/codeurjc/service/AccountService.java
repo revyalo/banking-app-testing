@@ -232,7 +232,7 @@ public class AccountService {
         Account o = getAccount(toAccountNumber);
 
         // Validate same account
-        if (m.getAccountNumber() == o.getAccountNumber()) {
+        if (m.getAccountNumber().equals(o.getAccountNumber())) {
             throw new IllegalArgumentException("Cannot transfer to same account");
         }
 
