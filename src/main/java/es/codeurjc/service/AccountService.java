@@ -25,6 +25,8 @@ public class AccountService {
     private final EmailNotificationService emailService;
     private final SmsNotificationService smsService;
     private final RandomService randomService;
+    public static final String DEPOSIT_CONFIRMATION = "Deposit Confirmation";
+    private static final int MAX_DEPOSIT = 10000;
 
     public AccountService(AccountRepository accountRepository,
             TransactionRepository transactionRepository,
@@ -75,18 +77,8 @@ public class AccountService {
      */
     @Transactional
     public Account deposit(String accountNumber, double amount, String description) {
-        if (amount == 0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-        if (amount > 10000) {
-            throw new IllegalArgumentException("Amount exceeds maximum deposit limit");
-        }
-        if (amount > 50000) {
-            throw new IllegalArgumentException("Amount exceeds maximum deposit limit");
-        }
+
+        validateDepositeAmount(amount);
 
         Account account = getAccount(accountNumber);
         account.deposit(amount);
@@ -99,73 +91,18 @@ public class AccountService {
         Account savedAccount = accountRepository.save(account);
 
         // Send notification
-        User.NotificationType notifType = account.getUser().getNotificationType();
-        if (notifType == User.NotificationType.EMAIL) {
-            emailService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.DEPOSIT,
-                    "Deposit Confirmation",
-                    String.format("Deposit of %.2f EUR. New balance: %.2f EUR",
-                            amount, account.getBalance()));
-        } else if (notifType == User.NotificationType.SMS) {
-            smsService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.DEPOSIT,
-                    "Deposit Confirmation",
-                    String.format("Deposit: %.2f EUR. Balance: %.2f EUR",
-                            amount, account.getBalance()));
-        }
-
+        sendDepositeConfirmation(account, amount);
         return savedAccount;
     }
 
     /**
      * Quick deposit without description
      */
+
+
     @Transactional
-    public Account deposit(String accountNumber, double amount) {
-        if (amount == 0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-        if (amount > 10000) {
-            throw new IllegalArgumentException("Amount exceeds maximum deposit limit");
-        }
-        if (amount > 50000) {
-            throw new IllegalArgumentException("Amount exceeds maximum deposit limit");
-        }
-
-        Account account = getAccount(accountNumber);
-        account.deposit(amount);
-
-        // Record transaction
-        Transaction transaction = new Transaction(account, Transaction.TransactionType.DEPOSIT,
-                amount, "Quick deposit");
-        transactionRepository.save(transaction);
-
-        Account savedAccount = accountRepository.save(account);
-
-        // Send notification
-        User.NotificationType notifType = account.getUser().getNotificationType();
-        if (notifType == User.NotificationType.EMAIL) {
-            emailService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.DEPOSIT,
-                    "Deposit Confirmation",
-                    String.format("Deposit of %.2f EUR. New balance: %.2f EUR",
-                            amount, account.getBalance()));
-        } else if (notifType == User.NotificationType.SMS) {
-            smsService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.DEPOSIT,
-                    "Deposit Confirmation",
-                    String.format("Deposit: %.2f EUR. Balance: %.2f EUR",
-                            amount, account.getBalance()));
-        }
-
-        return savedAccount;
+    public Account deposit(String accountNumber, double amount){
+        return deposit(accountNumber, amount, "Quick Deposit");
     }
 
     /**
@@ -182,7 +119,6 @@ public class AccountService {
         }
 
         Account account = getAccount(accountNumber);
-        Account seccondAccount;
 
         // Check balance
         if (account.getBalance() < amount) {
@@ -214,6 +150,35 @@ public class AccountService {
         }
 
         return savedAccount;
+    }
+
+    private void validateDepositeAmount(double amount){
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        if (amount > MAX_DEPOSIT) {
+            throw new IllegalArgumentException("Amount exceeds maximum deposit limit");
+        }
+    }
+
+    private void sendDepositeConfirmation(Account account, double amount){
+        // Send notification
+        User.NotificationType notifType = account.getUser().getNotificationType();
+        if (notifType == User.NotificationType.EMAIL) {
+            emailService.sendNotification(
+                    account.getUser(),
+                    Notification.NotificationType.DEPOSIT,
+                    DEPOSIT_CONFIRMATION,
+                    String.format("Deposit of %.2f EUR. New balance: %.2f EUR",
+                            amount, account.getBalance()));
+        } else if (notifType == User.NotificationType.SMS) {
+            smsService.sendNotification(
+                    account.getUser(),
+                    Notification.NotificationType.DEPOSIT,
+                    DEPOSIT_CONFIRMATION,
+                    String.format("Deposit: %.2f EUR. Balance: %.2f EUR",
+                            amount, account.getBalance()));
+        }
     }
 
     /**

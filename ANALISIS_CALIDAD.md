@@ -24,11 +24,9 @@ Afecta en la mantenibilidad con un grado de severidad high.
 
 **Refactorización**
 
-NO REALIZAR HATA LA TAREA 3
+![Imagen de codigo refactorizado 1](images/newString.png)
 
-Se utilizará una captura de pantalla del código o código resaltado para mostrar la solución. Se acompañará dicha solución de un breve comentario explicándola.
-
-
+Hemos creado una variable string, que se aplica todas las veces que se menciona tal string.
 
 ### Issue 2: Variable local no utilizada ("Second account")
 
@@ -45,9 +43,9 @@ Afecta en la mantenibilidad con un grado de severidad low.
 
 **Refactorización**
 
-NO REALIZAR HATA LA TAREA 3
+![Imagen de codigo refactorizado 2](images/Delete_seccondAccount.png)
 
-Se utilizará una captura de pantalla del código o código resaltado para mostrar la solución. Se acompañará dicha solución de un breve comentario explicándola.
+Hemos eliminado la declaración, puesto que no se utiliza.
 
 
 ### Issue 3: Error de logica con '=='
@@ -63,12 +61,12 @@ En el método transfer se intenta validar la cuenta de origen y la de destino no
 
 **Refactorización**
 
-NO REALIZAR HATA LA TAREA 3
+![Imagen de codigo refactorizado 3](images/refact_equals.png)
 
-Se utilizará una captura de pantalla del código o código resaltado para mostrar la solución. Se acompañará dicha solución de un breve comentario explicándola.
+Se ha sustituido el "==" por .equals, que nos permite validar correctamente las cuentas. 
 
 
-### Issue 4: Nombre de la issue
+### Issue 4: Condicionales inaccesibles y repetidos
 
 **Reporte de la issue**:
 ![imagen de codigo 2](images/unreachable_code.png)
@@ -81,9 +79,10 @@ del mismo método que están separados de forma innecesaria, cuando se podría m
 
 **Refactorización**
 
-NO REALIZAR HATA LA TAREA 3
+![Imagen de codigo refactorizado 3](images/validateDeposit.png)
 
-Se utilizará una captura de pantalla del código o código resaltado para mostrar la solución. Se acompañará dicha solución de un breve comentario explicándola.
+Hacemos el codigo mas modular, para permitir reutilizar esta funcion en otras.
+Hemos reducido el espacio del codigo a solamente dos condicionales necesarias, y hemos definido el maximo como un entero por si en el futuro, queremos cambiarlo.
 
 
 ### Issue 5: Duplicación de lógica en los métodos deposit
@@ -100,7 +99,11 @@ La lógica de diseño está duplicada en ambos métodos. Lo que incumple el prin
 
 **Refactorización**
 
-NO REALIZAR HATA LA TAREA 3
+![Imagen de codigo refactorizado 4](images/deposit_v2.png)
+![Imagen de codigo refactorizado 5](images/deposit_v2wtString.png)
+![Imagen de codigo refactorizado 6](images/sendDepositeConfirmation.png)
 
-Se utilizará una captura de pantalla del código o código resaltado para mostrar la solución. Se acompañará dicha solución de un breve comentario explicándola.
+
+Hemos hecho el codigo mas modular, simplemente reutilizar codigo hecho para no repetir constantemente la logica y hacerlo mas legible, como hemos hecho con la issue 4, hemos desencapsulado la logica de la confirmacion en otra funcion.
+El metodo del deposito que no declara ningun string, reutiliza el metodo con un string especificado.
 

@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -78,6 +79,8 @@ public class AccountServiceTest {
                 .hasMessageContaining("Cannot transfer to same account");
 
         verify(accountRepository, never()).save(any(Account.class));
+
     }
+
     
 }
