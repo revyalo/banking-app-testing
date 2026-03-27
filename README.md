@@ -21,7 +21,7 @@
 |:------------: |:------------:|
 |1| [Issue detectada](https://github.com/revyalo/ais-2026-grupo-z/commit/a9dfde9ae07436ce59379877ae1740aa405bd84a)|
 |2| [Prueba unitaria implementada](https://github.com/revyalo/ais-2026-grupo-z/commit/b69370af7430b8d80c3319b3a1897353b8833602)  |
-|3| [Refactorización implementada](https://github.com/revyalo/ais-2026-grupo-z/commit/ad59c540fbf04be748303a828fe92da398ccbced)  |
+|3| [Refactorización implementada](https://github.com/revyalo/ais-2026-grupo-z/commit/8c9e03e738bf6314286f3248499d2441e29b2a8b)  |
 |4| [Caso de TDD implementado](https://github.com/revyalo/ais-2026-grupo-z/commit/ecb938d019027eef9430168b494cb128b0a9e877)  |
 |5| [Prueba de sistema implementada](URL_commit_5)  |
 
