@@ -6,7 +6,7 @@
 | Nombre y Apellidos | Correo URJC | Usuario GitHub |
 |:---                 |:---                            |:--- |
 | David Arevalo Rey   | d.arevalo.2023@alumnos.urjc.es | revyalo |
-| Daniel Vela Quimbay | d.vela.2023@alumnos.urjc.es    | [User2] |
+| Daniel Vela Quimbay | d.vela.2023@alumnos.urjc.es    | danivequi |
 | Ricardo Ullco Lagla | r.ullco.2023@alumnos.urjc.es   | [User3] |
 
 ---
