@@ -7,6 +7,7 @@ import es.codeurjc.model.Transaction;
 import es.codeurjc.repository.AccountRepository;
 import es.codeurjc.repository.TransactionRepository;
 import es.codeurjc.service.AccountService;
+import es.codeurjc.service.RandomService;
 import es.codeurjc.service.notifications.EmailNotificationService;
 import es.codeurjc.service.notifications.SmsNotificationService;
 
@@ -39,8 +40,11 @@ public class AccountServiceTest {
     private EmailNotificationService emailService;
     @Mock
     private SmsNotificationService smsService;
+    @Mock
+    private RandomService randomService;
     @InjectMocks
     private AccountService accountService;
+
 
     @Test
     @DisplayName("Una transferencia exitosa valida saldos y guarda datos")
@@ -81,6 +85,9 @@ public class AccountServiceTest {
         verify(accountRepository, never()).save(any(Account.class));
 
     }
-
-    
+    @Test
+    @DisplayName("Generar una cuenta correctamente")
+    void createAccount(){
+        User user1 = new User();
+    }
 }
