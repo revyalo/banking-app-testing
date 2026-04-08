@@ -110,6 +110,7 @@ El metodo del deposito que no declara ningun string, reutiliza el metodo con un 
 ### Issue 6: Nombres de variables no esclarecedoras en el metodo transfer
 
 **Reporte de la issue**
+
 ![imagen de codigo 3](images/noneDefine.png)
 
 **Explicacion de los alumnos del mal olor detectado**
