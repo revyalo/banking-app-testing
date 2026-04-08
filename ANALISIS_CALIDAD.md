@@ -107,3 +107,21 @@ La lógica de diseño está duplicada en ambos métodos. Lo que incumple el prin
 Hemos hecho el codigo mas modular, simplemente reutilizar codigo hecho para no repetir constantemente la logica y hacerlo mas legible, como hemos hecho con la issue 4, hemos desencapsulado la logica de la confirmacion en otra funcion.
 El metodo del deposito que no declara ningun string, reutiliza el metodo con un string especificado.
 
+### Issue 6: Nombres de variables no esclarecedoras en el metodo transfer
+
+**Reporte de la issue**
+![imagen de codigo 3](images/noneDefine.png)
+
+**Explicacion de los alumnos del mal olor detectado**
+En el metodo 'transfer', las variables que represtnan la cuenta de origen y la de destino se llaman "m" y "o". Estos nombre como tal no aportan ningun significado y
+obligan al lector a leer todo el metodo para saber a que se hacen mencion. El punto de ello esque tiene que ser algo mas 
+descriptivo como "cuentaOrigen" y "cuentaDestino" por ejemplo. 
+
+### Issue 7: Nombre de metodos poco descriptivo
+
+**Reporte de la issue**
+![imagen de codigo 3](images/method.png)
+
+**Explicacion de los alumnos del mal olor detectado**
+Un metodo tan importante como el hecho de eliminar una cuenta bancaria, se llama "rm". Deberia llamarse algo como "deleteAccount"
+con el fin que de cualquier desarrollador entienda el propositode de dicho metodo sin necesidad de leer la implementacion.
