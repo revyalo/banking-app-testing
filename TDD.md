@@ -409,3 +409,247 @@ double interestRate = BASE_INTEREST + euriborService.getEuribor();
 **Captura de que TODOS los tests PASAN tras la refactorización**
 
 ![Pasa](images/test_passed_interest_rate_refactored.png)
+
+### Se aprueba un préstamo con un Euribor al 3% tendra una cuota de 875 euros al mes
+
+**Código de test**
+```java
+@Test
+@DisplayName("Estrategia TDD: Un prestamo aprobado con Euribor al 3% tiene una cuota de 875€ al mes")
+void algorithm_monthlyPayment_euribor3() {
+    when(euriborService.getEuribor()).thenReturn(3.0);
+
+    LoanRequest request = new LoanRequest();
+    request.setAmount(20000.0);
+    request.setTermMonths(24);
+    request.setCustomerBalance(5000.0);
+    request.setMonthlyIncome(3000.0);
+
+    LoanEvaluationResult result = algorithm.evaluate(request);
+
+    assertTrue(result.isApproved());
+    assertEquals(5.0, result.getInterestRate(), 0.01);
+    assertEquals(875.0, result.getMonthlyPayment(), 0.01);
+}
+```
+
+**Mensaje del test añadido que NO PASA**
+
+```log
+org.opentest4j.AssertionFailedError: 
+Expected :875.0
+Actual   :0.0
+```
+**Código mínimo para que el test pase**
+
+Se ha añadido el cálculo de la cuota mensual
+
+```java
+public class LoanApprovalAlgorithm {
+
+    private static final double MIN_AMOUNT = 1000.0;
+    private static final double MAX_AMOUNT = 50000.0;
+    private static final String VALUE_OUT = "Valor fuera de rango";
+
+    private static final int MIN_TERM = 6;
+    private static final int MAX_TERM = 120;
+    private static final String TERM_OUT = "Plazo fuera de rango";
+    private final EuriborService euriborService;
+
+    public LoanApprovalAlgorithm(EuriborService euriborService) {
+        this.euriborService = euriborService;
+    }
+
+    public LoanEvaluationResult evaluate(LoanRequest request) {
+        if (request.getAmount() < MIN_AMOUNT || request.getAmount() > MAX_AMOUNT) {
+            return new LoanEvaluationResult(false ,VALUE_OUT);
+        }
+
+        if (request.getTermMonths() < MIN_TERM || request.getTermMonths() > MAX_TERM){
+            return new LoanEvaluationResult(false ,TERM_OUT);
+
+        }
+        if (request.getCustomerBalance() < request.getAmount() * 0.20) {
+            return new LoanEvaluationResult(false, "Saldo insuficiente");
+        }
+
+        double interestRate = 2.0 + euriborService.getEuribor();
+        double monthlyPayment = (request.getAmount() * (1+ interestRate / 100.0)) / request.getTermMonths();
+        return new LoanEvaluationResult(true, "Aprobado", request.getAmount(), interestRate, monthlyPayment);
+    }
+}
+```
+
+**Captura de que TODOS los test PASAN**
+
+![Pasa](images/testpasan1.png)
+
+### Se aprueba un préstamo con un Euribor al 3.5% tendra una cuota de 878.17 euros al mes
+
+**Código de test**
+```java
+@Test
+@DisplayName("Estrategia TDD: Un prestamo aprobado con Euribor al 3.5% tiene una cuota de 878.17€ al mes")
+void algorithm_monthlyPayment_euribor35() {
+    when(euriborService.getEuribor()).thenReturn(3.5);
+
+    LoanRequest request = new LoanRequest();
+    request.setAmount(20000.0);
+    request.setTermMonths(24);
+    request.setCustomerBalance(5000.0);
+    request.setMonthlyIncome(3000.0);
+
+    LoanEvaluationResult result = algorithm.evaluate(request);
+
+    assertTrue(result.isApproved());
+    assertEquals(5.5, result.getInterestRate(), 0.01);
+    assertEquals(878.17, result.getMonthlyPayment(), 0.01);
+}
+```
+
+**Mensaje del test añadido que NO PASA**
+```log
+org.opentest4j.AssertionFailedError:
+Expected :878.17
+Actual   :879.1666666666666
+```
+
+Es un error matematico ya que al aplicar la fórmula el valor es 879.17 no 878.17
+
+### Se aprueba un préstamo con un Euribor al 5% tendra una cuota de 891.67 euros al mes
+
+**Código de test**
+```java
+@Test
+@DisplayName("Estrategia TDD: Un prestamo aprobado con Euribor al 5% tiene una cuota de 891.67€ al mes")
+void algorithm_monthlyPayment_euribor5() {
+    when(euriborService.getEuribor()).thenReturn(5.0);
+
+    LoanRequest request = new LoanRequest();
+    request.setAmount(20000.0);
+    request.setTermMonths(24);
+    request.setCustomerBalance(5000.0);
+    request.setMonthlyIncome(3000.0);
+
+    LoanEvaluationResult result = algorithm.evaluate(request);
+
+    assertTrue(result.isApproved());
+    assertEquals(7.0, result.getInterestRate(), 0.01);
+    assertEquals(891.67, result.getMonthlyPayment(), 0.01);
+}
+```
+
+**Mensaje del test añadido que  PASA**
+
+![Pasa](images/testpasan3.png)
+
+### Se rechaza un préstamo de 20000 euros a 24 meses con euribor a 3% a un cliente con un ingreso de 2000 euros mensuales
+
+**Código de test**
+```java
+@Test
+@DisplayName("Estrategia TDD: Se rechaza el prestamo si la cuota supera el 40% de los ingresos mensuales")
+void algorithm_rejected_whenMonthlyPaymentExceeds40PercentOfIncome() {
+    when(euriborService.getEuribor()).thenReturn(3.0);
+
+    LoanRequest request = new LoanRequest();
+    request.setAmount(20000.0);
+    request.setTermMonths(24);
+    request.setCustomerBalance(5000.0);
+    request.setMonthlyIncome(2000.0);
+
+    LoanEvaluationResult result = algorithm.evaluate(request);
+
+    assertFalse(result.isApproved(), "Este prestamo debe rechazarse porque la cuota supera el 40% de los ingresos");
+}
+```
+
+**Mensaje del test añadido que NO PASA**
+
+```log
+org.opentest4j.AssertionFailedError: Este prestamo debe rechazarse porque la cuota supera el 40% de los ingresos ==> 
+Expected :false
+Actual   :true
+```
+
+**Código mínimo para que el test pase**
+
+Se ha añadido una condición para comprobar si la cuota mensual supera el 40%
+
+```java
+public LoanEvaluationResult evaluate(LoanRequest request) {
+    if (request.getAmount() < MIN_AMOUNT || request.getAmount() > MAX_AMOUNT) {
+        return new LoanEvaluationResult(false ,VALUE_OUT);
+    }
+
+    if (request.getTermMonths() < MIN_TERM || request.getTermMonths() > MAX_TERM){
+        return new LoanEvaluationResult(false ,TERM_OUT);
+
+    }
+    if (request.getCustomerBalance() < request.getAmount() * 0.20) {
+        return new LoanEvaluationResult(false, "Saldo insuficiente");
+    }
+
+    double interestRate = 2.0 + euriborService.getEuribor();
+    double monthlyPayment = (request.getAmount() * (1+ interestRate / 100.0)) / request.getTermMonths();
+    if (monthlyPayment > request.getMonthlyIncome() * 0.40) {return new LoanEvaluationResult(false, "Cuota demasiado alta");}
+    return new LoanEvaluationResult(true, "Aprobado", request.getAmount(), interestRate, monthlyPayment);
+}
+```
+
+**Captura de que TODOS los test PASAN**
+
+![Pasa](images/testpasa4.png)
+
+### Se rechaza un préstamo de 20000 euros a 7 meses con euribor a 5% a un cliente con un ingreso de 3000 euros mensuales
+
+**Código de test**
+```java
+@Test
+@DisplayName("Estrategia TDD: Se rechaza el prestamo si el plazo corto hace que la cuota supere el 40% de los ingresos")
+void algorithm_rejected_whenShortTermMakesMonthlyPaymentTooHigh() {
+    when(euriborService.getEuribor()).thenReturn(5.0);
+
+    LoanRequest request = new LoanRequest();
+    request.setAmount(20000.0);
+    request.setTermMonths(7);
+    request.setCustomerBalance(5000.0);
+    request.setMonthlyIncome(3000.0);
+
+    LoanEvaluationResult result = algorithm.evaluate(request);
+
+    assertFalse(result.isApproved(), "Este prestamo debe rechazarse porque la cuota supera el 40% de los ingresos");
+    assertEquals("Cuota demasiado alta", result.getReason());
+}
+```
+
+**Mensaje del test añadido que PASA**
+
+![Pasa](images/testpasasn5.png)
+
+### Se acepta un préstamo de 20000 euros a 24 meses con euribor a 3% a un cliente con un ingreso de 3000 euros mensuales
+
+**Código de test**
+```java
+@Test
+@DisplayName("Estrategia TDD: Se aprueba el prestamo si la cuota no supera el 40% de los ingresos")
+void algorithm_approved_whenMonthlyPaymentIsWithin40PercentOfIncome() {
+    when(euriborService.getEuribor()).thenReturn(3.0);
+
+    LoanRequest request = new LoanRequest();
+    request.setAmount(20000.0);
+    request.setTermMonths(24);
+    request.setCustomerBalance(5000.0);
+    request.setMonthlyIncome(3000.0);
+
+    LoanEvaluationResult result = algorithm.evaluate(request);
+
+    assertTrue(result.isApproved(), "Este prestamo debe aprobarse porque la cuota no supera el 40% de los ingresos");
+    assertEquals("Aprobado", result.getReason());
+    assertEquals(875.0, result.getMonthlyPayment(), 0.01);
+}
+```
+
+**Mensaje del test añadido que PASA**
+
+![Pasa](images/testpasan6.png)

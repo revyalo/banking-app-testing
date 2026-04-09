@@ -127,4 +127,103 @@ public class LoanApprovalAlgorithmTest {
         assertTrue(result.isApproved());
         assertEquals(5.0, result.getInterestRate());
     }
+    @Test
+    @DisplayName("Estrategia TDD: Un prestamo aprobado con Euribor al 3% tiene una cuota de 875€ al mes")
+    void algorithm_monthlyPayment_euribor3() {
+        when(euriborService.getEuribor()).thenReturn(3.0);
+
+        LoanRequest request = new LoanRequest();
+        request.setAmount(20000.0);
+        request.setTermMonths(24);
+        request.setCustomerBalance(5000.0);
+        request.setMonthlyIncome(3000.0);
+
+        LoanEvaluationResult result = algorithm.evaluate(request);
+
+        assertTrue(result.isApproved());
+        assertEquals(5.0, result.getInterestRate(), 0.01);
+        assertEquals(875.0, result.getMonthlyPayment(), 0.01);
+    }
+    @Test
+    @DisplayName("Estrategia TDD: Un prestamo aprobado con Euribor al 3.5% tiene una cuota de 878.17€ al mes")
+    void algorithm_monthlyPayment_euribor35() {
+        when(euriborService.getEuribor()).thenReturn(3.5);
+
+        LoanRequest request = new LoanRequest();
+        request.setAmount(20000.0);
+        request.setTermMonths(24);
+        request.setCustomerBalance(5000.0);
+        request.setMonthlyIncome(3000.0);
+
+        LoanEvaluationResult result = algorithm.evaluate(request);
+
+        assertTrue(result.isApproved());
+        assertEquals(5.5, result.getInterestRate(), 0.01);
+        assertEquals(878.17, result.getMonthlyPayment(), 0.01);
+    }
+    @Test
+    @DisplayName("Estrategia TDD: Un prestamo aprobado con Euribor al 5% tiene una cuota de 891.67€ al mes")
+    void algorithm_monthlyPayment_euribor5() {
+        when(euriborService.getEuribor()).thenReturn(5.0);
+
+        LoanRequest request = new LoanRequest();
+        request.setAmount(20000.0);
+        request.setTermMonths(24);
+        request.setCustomerBalance(5000.0);
+        request.setMonthlyIncome(3000.0);
+
+        LoanEvaluationResult result = algorithm.evaluate(request);
+
+        assertTrue(result.isApproved());
+        assertEquals(7.0, result.getInterestRate(), 0.01);
+        assertEquals(891.67, result.getMonthlyPayment(), 0.01);
+    }
+    @Test
+    @DisplayName("Estrategia TDD: Se rechaza el prestamo si la cuota supera el 40% de los ingresos mensuales")
+    void algorithm_rejected_whenMonthlyPaymentExceeds40PercentOfIncome() {
+        when(euriborService.getEuribor()).thenReturn(3.0);
+
+        LoanRequest request = new LoanRequest();
+        request.setAmount(20000.0);
+        request.setTermMonths(24);
+        request.setCustomerBalance(5000.0);
+        request.setMonthlyIncome(2000.0);
+
+        LoanEvaluationResult result = algorithm.evaluate(request);
+
+        assertFalse(result.isApproved(), "Este prestamo debe rechazarse porque la cuota supera el 40% de los ingresos");
+    }
+    @Test
+    @DisplayName("Estrategia TDD: Se rechaza el prestamo si el plazo corto hace que la cuota supere el 40% de los ingresos")
+    void algorithm_rejected_whenShortTermMakesMonthlyPaymentTooHigh() {
+        when(euriborService.getEuribor()).thenReturn(5.0);
+
+        LoanRequest request = new LoanRequest();
+        request.setAmount(20000.0);
+        request.setTermMonths(7);
+        request.setCustomerBalance(5000.0);
+        request.setMonthlyIncome(3000.0);
+
+        LoanEvaluationResult result = algorithm.evaluate(request);
+
+        assertFalse(result.isApproved(), "Este prestamo debe rechazarse porque la cuota supera el 40% de los ingresos");
+        assertEquals("Cuota demasiado alta", result.getReason());
+    }
+    @Test
+    @DisplayName("Estrategia TDD: Se aprueba el prestamo si la cuota no supera el 40% de los ingresos")
+    void algorithm_approved_whenMonthlyPaymentIsWithin40PercentOfIncome() {
+        when(euriborService.getEuribor()).thenReturn(3.0);
+
+        LoanRequest request = new LoanRequest();
+        request.setAmount(20000.0);
+        request.setTermMonths(24);
+        request.setCustomerBalance(5000.0);
+        request.setMonthlyIncome(3000.0);
+
+        LoanEvaluationResult result = algorithm.evaluate(request);
+
+        assertTrue(result.isApproved(), "Este prestamo debe aprobarse porque la cuota no supera el 40% de los ingresos");
+        assertEquals("Aprobado", result.getReason());
+        assertEquals(875.0, result.getMonthlyPayment(), 0.01);
+    }
 }

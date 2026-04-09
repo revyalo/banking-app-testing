@@ -32,6 +32,8 @@ public class LoanApprovalAlgorithm {
         }
 
         double interestRate = 2.0 + euriborService.getEuribor();
-        return new LoanEvaluationResult(true, "Aprobado", request.getAmount(), interestRate, 0);
+        double monthlyPayment = (request.getAmount() * (1+ interestRate / 100.0)) / request.getTermMonths();
+        if (monthlyPayment > request.getMonthlyIncome() * 0.40) {return new LoanEvaluationResult(false, "Cuota demasiado alta");}
+        return new LoanEvaluationResult(true, "Aprobado", request.getAmount(), interestRate, monthlyPayment);
     }
 }
