@@ -311,7 +311,7 @@ public class AccountServiceTest {
 
         when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
 
-        assertThatThrownBy(() -> accountService.rm("cuenta")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot delete account with non-zero balance");
+        assertThatThrownBy(() -> accountService.deleteAccount("cuenta")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot delete account with non-zero balance");
 
         verify(accountRepository, never()).delete(any(Account.class));
     }
@@ -323,7 +323,7 @@ public class AccountServiceTest {
 
         when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
 
-        accountService.rm("cuenta");
+        accountService.deleteAccount("cuenta");
 
         verify(accountRepository).delete(account);
     }
