@@ -1,6 +1,7 @@
 package es.codeurjc.service.loan;
 
 import es.codeurjc.model.LoanEvaluationResult;
+import es.codeurjc.service.EuriborService;
 
 public class LoanApprovalAlgorithm {
 
@@ -11,6 +12,11 @@ public class LoanApprovalAlgorithm {
     private static final int MIN_TERM = 6;
     private static final int MAX_TERM = 120;
     private static final String TERM_OUT = "Plazo fuera de rango";
+    private final EuriborService euriborService;
+
+    public LoanApprovalAlgorithm(EuriborService euriborService) {
+        this.euriborService = euriborService;
+    }
 
     public LoanEvaluationResult evaluate(LoanRequest request) {
         if (request.getAmount() < MIN_AMOUNT || request.getAmount() > MAX_AMOUNT) {
@@ -21,6 +27,11 @@ public class LoanApprovalAlgorithm {
             return new LoanEvaluationResult(false ,TERM_OUT);
 
         }
-        return new LoanEvaluationResult(true, "Aprobado");
+        if (request.getCustomerBalance() < request.getAmount() * 0.20) {
+            return new LoanEvaluationResult(false, "Saldo insuficiente");
+        }
+
+        double interestRate = 2.0 + euriborService.getEuribor();
+        return new LoanEvaluationResult(true, "Aprobado", request.getAmount(), interestRate, 0);
     }
 }

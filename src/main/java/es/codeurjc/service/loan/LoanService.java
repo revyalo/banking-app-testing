@@ -7,10 +7,11 @@ import es.codeurjc.model.LoanEvaluationResult;
 import es.codeurjc.model.Notification;
 import es.codeurjc.repository.AccountRepository;
 import es.codeurjc.repository.LoanRepository;
+import es.codeurjc.service.EuriborService;
 import es.codeurjc.service.notifications.EmailNotificationService;
 import es.codeurjc.service.notifications.SmsNotificationService;
 import es.codeurjc.repository.LoanEvaluationResultRepository;
-
+import es.codeurjc.service.EuriborService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +35,13 @@ public class LoanService {
             AccountRepository accountRepository,
             EmailNotificationService emailService,
             SmsNotificationService smsService,
+            EuriborService euriborService,
             LoanEvaluationResultRepository loanEvaluationResultRepository) {
         this.loanRepository = loanRepository;
         this.accountRepository = accountRepository;
         this.emailService = emailService;
         this.smsService = smsService;
-        this.loanApprovalAlgorithm = new LoanApprovalAlgorithm();
+        this.loanApprovalAlgorithm = new LoanApprovalAlgorithm(euriborService);
         this.loanEvaluationResultRepository = loanEvaluationResultRepository;
     }
 
