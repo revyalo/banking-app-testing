@@ -27,7 +27,7 @@ public class AccountService {
     private final RandomService randomService;
     public static final String DEPOSIT_CONFIRMATION = "Deposit Confirmation";
     private static final int MAX_DEPOSIT = 10000;
-    private static final int MAX_TANSFER = 20000;
+    private static final int MAX_TRANSFER = 20000;
     private static final int MAX_WITHDRAW = 5000;
     private static final int ACCOUNT_NUMBER_BOUND = 1000000000;
 
@@ -57,7 +57,7 @@ public class AccountService {
      * Generate account number
      */
     private String generateAccountNumber() {
-        return String.format("ES%010d", randomService.nextInt(1000000000));
+        return String.format("ES%010d", randomService.nextInt(ACCOUNT_NUMBER_BOUND));
     }
 
     /**
@@ -161,57 +161,36 @@ public class AccountService {
      */
     @Transactional
     public void transfer(String fromAccountNumber, String toAccountNumber, double amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-        if (amount > MAX_TANSFER) {
-            throw new IllegalArgumentException("Amount exceeds maximum transfer limit");
-        }
+        validateTransferAmount(amount);
 
         Account sourceAccount = getAccount(fromAccountNumber);
         Account destinationAccount = getAccount(toAccountNumber);
 
         // Validate same account
-        if (sourceAccount.getAccountNumber().equals(destinationAccount .getAccountNumber())) {
-            throw new IllegalArgumentException("Cannot transfer to same account");
-        }
+        validateDifferentAccounts(sourceAccount, destinationAccount);
 
         // Check balance
-        if (sourceAccount.getBalance() < amount) {
-            throw new IllegalArgumentException("Insufficient funds");
-        }
+        validateSufficientFunds(sourceAccount, amount);
 
         // Perform transfer
         sourceAccount.withdraw(amount);
         destinationAccount .deposit(amount);
 
         // Record transactions
-        Transaction sentTransaction = new Transaction(sourceAccount,
-                Transaction.TransactionType.TRANSFER_SENT,
-                amount,
-                "Transfer to " + toAccountNumber);
-        sentTransaction.setDestinationAccountNumber(toAccountNumber);
-        transactionRepository.save(sentTransaction);
-
-        Transaction receivedTransaction = new Transaction(destinationAccount ,
-                Transaction.TransactionType.TRANSFER_RECEIVED,
-                amount,
-                "Transfer from " + fromAccountNumber);
-        receivedTransaction.setDestinationAccountNumber(fromAccountNumber);
-        transactionRepository.save(receivedTransaction);
+        saveTransferTransactions(sourceAccount, destinationAccount, amount, fromAccountNumber, toAccountNumber);
 
         accountRepository.save(sourceAccount);
         accountRepository.save(destinationAccount);
 
-        sendNotificationByPreference(m.getUser(), Notification.NotificationType.TRANSFER, "Transfer Sent", "Transfer Sent", String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, m.getBalance()), String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, m.getBalance()));
+        sendNotificationByPreference(sourceAccount.getUser(), Notification.NotificationType.TRANSFER, "Transfer Sent", "Transfer Sent", String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, sourceAccount.getBalance()), String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, sourceAccount.getBalance()));
 
-        sendNotificationByPreference(o.getUser(), Notification.NotificationType.TRANSFER, "Transfer Received", "Transfer Received", String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR", amount, fromAccountNumber, o.getBalance()), String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR", amount, fromAccountNumber, o.getBalance()));
+        sendNotificationByPreference(destinationAccount.getUser(), Notification.NotificationType.TRANSFER, "Transfer Received", "Transfer Received", String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR", amount, fromAccountNumber, destinationAccount.getBalance()), String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR", amount, fromAccountNumber, destinationAccount.getBalance()));
     }
 
     /**
      * Delete account
      */
-    public void rm(String accountNumber) {
+    public void deleteAccount(String accountNumber) {
         Account account = getAccount(accountNumber);
 
         if (account.getBalance() != 0) {
@@ -251,8 +230,27 @@ public class AccountService {
         if(amount <= 0){
             throw new IllegalArgumentException("Amount must be positive");
         }
-        if(amount > MAX_TANSFER){
-            throw new IllegalArgumentException("Amount must be positive");
+        if(amount > MAX_TRANSFER){
+            throw new IllegalArgumentException("Amount exceeds maximum transfer limit");
         }
+    }
+    private void validateDifferentAccounts(Account sourceAccount, Account destinationAccount) {
+        if (sourceAccount.getAccountNumber().equals(destinationAccount.getAccountNumber())) {
+            throw new IllegalArgumentException("Cannot transfer to same account");
+        }
+    }
+    private void validateSufficientFunds(Account sourceAccount, double amount) {
+        if (sourceAccount.getBalance() < amount) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+    }
+    private void saveTransferTransactions(Account sourceAccount, Account destinationAccount, double amount, String fromAccountNumber, String toAccountNumber) {
+        Transaction sentTransaction = new Transaction(sourceAccount, Transaction.TransactionType.TRANSFER_SENT, amount, "Transfer to " + toAccountNumber);
+        sentTransaction.setDestinationAccountNumber(toAccountNumber);
+        transactionRepository.save(sentTransaction);
+
+        Transaction receivedTransaction = new Transaction(destinationAccount, Transaction.TransactionType.TRANSFER_RECEIVED, amount, "Transfer from " + fromAccountNumber);
+        receivedTransaction.setDestinationAccountNumber(fromAccountNumber);
+        transactionRepository.save(receivedTransaction);
     }
 }
