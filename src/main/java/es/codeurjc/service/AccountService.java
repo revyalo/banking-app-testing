@@ -27,6 +27,9 @@ public class AccountService {
     private final RandomService randomService;
     public static final String DEPOSIT_CONFIRMATION = "Deposit Confirmation";
     private static final int MAX_DEPOSIT = 10000;
+    private static final int MAX_TANSFER = 20000;
+    private static final int MAX_WITHDRAW = 5000;
+    private static final int ACCOUNT_NUMBER_BOUND = 1000000000;
 
     public AccountService(AccountRepository accountRepository,
             TransactionRepository transactionRepository,
@@ -54,7 +57,7 @@ public class AccountService {
      * Generate account number
      */
     private String generateAccountNumber() {
-        return String.format("ES%010d", randomService.nextInt(1000000000));
+        return String.format("ES%010d", randomService.nextInt(ACCOUNT_NUMBER_BOUND));
     }
 
     /**
@@ -114,7 +117,7 @@ public class AccountService {
             throw new IllegalArgumentException("Amount must be positive");
         }
 
-        if (amount > 5000) {
+        if (amount > MAX_WITHDRAW) {
             throw new IllegalArgumentException("Amount exceeds maximum withdrawal limit");
         }
 
@@ -134,20 +137,7 @@ public class AccountService {
 
         Account savedAccount = accountRepository.save(account);
 
-        User.NotificationType notifType = account.getUser().getNotificationType();
-        if (notifType == User.NotificationType.EMAIL) {
-            emailService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.WITHDRAWAL,
-                    "Withdrawal Confirmation",
-                    String.format("Withdrawal of %.2f EUR. New balance: %.2f EUR", amount, account.getBalance()));
-        } else if (notifType == User.NotificationType.SMS) {
-            smsService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.WITHDRAWAL,
-                    "Withdrawal",
-                    String.format("Withdrawal of %.2f EUR. New balance: %.2f EUR", amount, account.getBalance()));
-        }
+        sendNotificationByPreference(account.getUser(), Notification.NotificationType.WITHDRAWAL, "Withdrawal Confirmation", "Withdrawal", String.format("Withdrawal of %.2f EUR. New balance: %.2f EUR", amount, account.getBalance()), String.format("Withdrawal of %.2f EUR. New balance: %.2f EUR", amount, account.getBalance()));
 
         return savedAccount;
     }
@@ -163,22 +153,7 @@ public class AccountService {
 
     private void sendDepositeConfirmation(Account account, double amount){
         // Send notification
-        User.NotificationType notifType = account.getUser().getNotificationType();
-        if (notifType == User.NotificationType.EMAIL) {
-            emailService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.DEPOSIT,
-                    DEPOSIT_CONFIRMATION,
-                    String.format("Deposit of %.2f EUR. New balance: %.2f EUR",
-                            amount, account.getBalance()));
-        } else if (notifType == User.NotificationType.SMS) {
-            smsService.sendNotification(
-                    account.getUser(),
-                    Notification.NotificationType.DEPOSIT,
-                    DEPOSIT_CONFIRMATION,
-                    String.format("Deposit: %.2f EUR. Balance: %.2f EUR",
-                            amount, account.getBalance()));
-        }
+        sendNotificationByPreference(account.getUser(), Notification.NotificationType.DEPOSIT, DEPOSIT_CONFIRMATION, DEPOSIT_CONFIRMATION, String.format("Deposit of %.2f EUR. New balance: %.2f EUR", amount, account.getBalance()), String.format("Deposit: %.2f EUR. Balance: %.2f EUR", amount, account.getBalance()));
     }
 
     /**
@@ -189,7 +164,7 @@ public class AccountService {
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
-        if (amount > 20000) {
+        if (amount > MAX_TANSFER) {
             throw new IllegalArgumentException("Amount exceeds maximum transfer limit");
         }
 
@@ -228,36 +203,9 @@ public class AccountService {
         accountRepository.save(m);
         accountRepository.save(o);
 
-        User.NotificationType notifType = m.getUser().getNotificationType();
-        if (notifType == User.NotificationType.EMAIL) {
-            emailService.sendNotification(
-                    m.getUser(),
-                    Notification.NotificationType.TRANSFER,
-                    "Transfer Sent",
-                    String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, m.getBalance()));
-        } else if (notifType == User.NotificationType.SMS) {
-            smsService.sendNotification(
-                    m.getUser(), 
-                    Notification.NotificationType.TRANSFER, 
-                    "Transfer Sent",
-                    String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, m.getBalance()));
-        }
+        sendNotificationByPreference(m.getUser(), Notification.NotificationType.TRANSFER, "Transfer Sent", "Transfer Sent", String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, m.getBalance()), String.format("Transfer of %.2f EUR to %s. New balance: %.2f EUR", amount, toAccountNumber, m.getBalance()));
 
-        User.NotificationType notifTypeTo = o.getUser().getNotificationType();
-        if (notifTypeTo == User.NotificationType.EMAIL) {
-            emailService.sendNotification(
-                    o.getUser(),
-                    Notification.NotificationType.TRANSFER,
-                    "Transfer Received",
-                    String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR",
-                        amount, fromAccountNumber, o.getBalance()));
-        } else if (notifTypeTo == User.NotificationType.SMS) {
-            smsService.sendNotification(
-                o.getUser(), 
-                Notification.NotificationType.TRANSFER, 
-                "Transfer Received",
-                String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR", amount, fromAccountNumber, o.getBalance()));
-        }
+        sendNotificationByPreference(o.getUser(), Notification.NotificationType.TRANSFER, "Transfer Received", "Transfer Received", String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR", amount, fromAccountNumber, o.getBalance()), String.format("Transfer of %.2f EUR from %s. New balance: %.2f EUR", amount, fromAccountNumber, o.getBalance()));
     }
 
     /**
@@ -287,5 +235,24 @@ public class AccountService {
     public List<Transaction> getTransactions(String accountNumber) {
         Account account = getAccount(accountNumber);
         return transactionRepository.findByAccountOrderByTimestampDesc(account);
+    }
+
+    private void sendNotificationByPreference(User user,Notification.NotificationType notificationType, String emailSubject, String smsSubject, String emailMessage, String smsMessage){
+        User.NotificationType ntype = user.getNotificationType();
+
+        if(ntype == User.NotificationType.EMAIL){
+            emailService.sendNotification(user, notificationType, emailSubject, emailMessage);
+        }else if(ntype ==User.NotificationType.SMS){
+            smsService.sendNotification(user, notificationType, smsSubject, smsMessage);
+        }
+    }
+
+    private void validateTransferAmount(double amount){
+        if(amount <= 0){
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        if(amount > MAX_TANSFER){
+            throw new IllegalArgumentException("Amount must be positive");
+        }
     }
 }
