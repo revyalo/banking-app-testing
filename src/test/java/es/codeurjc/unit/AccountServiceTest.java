@@ -19,10 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-
+import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -89,7 +88,59 @@ public class AccountServiceTest {
     @DisplayName("Generar una cuenta correctamente")
     void createAccount(){
         User user1 = new User();
+        Account expectedAccount = new Account("ES0123456789", Account.AccountType.CHECKING, 0);
+        expectedAccount.setUser(user1);
+        when(randomService.nextInt(1000000000)).thenReturn(123456789);
+        when(accountRepository.save(any(Account.class))).thenReturn(expectedAccount);
+
+        Account accountResult = accountService.createAccount(user1, Account.AccountType.CHECKING);
+
+        assertThat(accountResult.getAccountNumber()).isEqualTo("ES0123456789");
+        assertThat(accountResult.getAccountType()).isEqualTo(Account.AccountType.CHECKING);
+        assertThat(accountResult.getBalance()).isEqualTo(expectedAccount.getBalance());
+        assertThat(accountResult.getUser()).isEqualTo(user1);
+        verify(accountRepository).save(any(Account.class));
     }
+    @Test
+    @DisplayName("Obteniendo cuentas de un user")
+    void getUserAccount_success(){
+        User user1 = new User();
+        List <Account> expectedAccounts = List.of(
+                new Account("ES001", Account.AccountType.CHECKING, 1000),
+                new Account("ES002", Account.AccountType.SAVINGS, 500.0)
+        );
+        when (accountRepository.findByUser(user1)).thenReturn(expectedAccounts);
+        List<Account> accountResults = accountService.getUserAccounts(user1);
+        assertThat(accountResults.size()).isEqualTo(expectedAccounts.size());
+        verify(accountRepository).findByUser(user1);
+    }
+    @Test
+    @DisplayName("Obteniendo transacciones de una cuenta determinada")
+    void getTransactionAccount_success(){
+        Account account = new Account("ES001", Account.AccountType.CHECKING, 1000);
+        Transaction transaction0 = new Transaction(account, Transaction.TransactionType.DEPOSIT, 500, "Deposit");
+        Transaction transaction1 = new Transaction(account, Transaction.TransactionType.WITHDRAWAL, 200, "Withdrawal");
+        List<Transaction> expectedTransactions = List.of(transaction0, transaction1);
+
+        when(accountRepository.findByAccountNumber("ES123")).thenReturn(Optional.of(account));
+        when(transactionRepository.findByAccountOrderByTimestampDesc(account)).thenReturn(expectedTransactions);
+        List<Transaction> result = accountService.getTransactions("ES123");
+
+        assertThat(result).hasSize(expectedTransactions.size());
+        assertThat(result).isEqualTo(expectedTransactions);
+        verify(transactionRepository).findByAccountOrderByTimestampDesc(account);
+    }
+    @Test
+    @DisplayName("Obteniendo balance de una cuenta")
+    void getBalance_success(){
+        Account account = new Account("ES001", Account.AccountType.CHECKING, 1000);
+        when(accountRepository.findByAccountNumber("ES123")).thenReturn(Optional.of(account));
+
+        double result = accountService.getBalance("ES123");
+
+        assertThat(result).isEqualTo(1000);
+    }
+
 
     @Test
     @DisplayName("Lanza excepeción si el deposito es menor o igual que 0")
@@ -260,7 +311,7 @@ public class AccountServiceTest {
 
         when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
 
-        assertThatThrownBy(() -> accountService.rm("cuenta")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot delete account with non-zero balance");
+        assertThatThrownBy(() -> accountService.deleteAccount("cuenta")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Cannot delete account with non-zero balance");
 
         verify(accountRepository, never()).delete(any(Account.class));
     }
@@ -272,7 +323,7 @@ public class AccountServiceTest {
 
         when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
 
-        accountService.rm("cuenta");
+        accountService.deleteAccount("cuenta");
 
         verify(accountRepository).delete(account);
     }

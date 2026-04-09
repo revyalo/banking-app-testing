@@ -111,18 +111,30 @@ El metodo del deposito que no declara ningun string, reutiliza el metodo con un 
 
 **Reporte de la issue**
 
-![imagen de codigo 3](images/noneDefine.png)
+![imagen de codigo 5](images/noneDefine.png)
 
 **Explicacion de los alumnos del mal olor detectado**
-En el metodo 'transfer', las variables que represtnan la cuenta de origen y la de destino se llaman "m" y "o". Estos nombre como tal no aportan ningun significado y
+En el metodo 'transfer', las variables que representan la cuenta de origen y la de destino se llaman "m" y "o". Estos nombre como tal no aportan ningun significado y
 obligan al lector a leer todo el metodo para saber a que se hacen mencion. El punto de ello esque tiene que ser algo mas 
 descriptivo como "cuentaOrigen" y "cuentaDestino" por ejemplo. 
 
+**Refactorizacion**
+
+![Imagen de codigo refactorizado 6](images/refact.png)
+Se han renombrado las variables "m" y "o" a "sourceAccount" y "destinationAccount" respectivamente. 
+De esta forma el código es autoexplicativo y cualquier desarrollador entiende el propósito de cada variable sin necesidad de leer el contexto completo del método.
 ### Issue 7: Nombre de metodos poco descriptivo
 
 **Reporte de la issue**
-![imagen de codigo 3](images/method.png)
+![imagen de codigo 6](images/method.png)
 
 **Explicacion de los alumnos del mal olor detectado**
 Un metodo tan importante como el hecho de eliminar una cuenta bancaria, se llama "rm". Deberia llamarse algo como "deleteAccount"
 con el fin que de cualquier desarrollador entienda el propositode de dicho metodo sin necesidad de leer la implementacion.
+
+**Refactorizacion**
+
+![Imagen de codigo refactorizado 7](images/refact2.png)
+Se ha renombrado el método "rm" a "deleteAccount", que describe claramente la acción que realiza. 
+También se han actualizado todas las llamadas a este método en el resto del proyecto para que utilicen el nuevo nombre.
+Tras ejecutar los tests con "mvn clean test", se verifica que no se ha introducido ninguna regresión.
