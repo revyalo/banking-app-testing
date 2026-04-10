@@ -29,13 +29,13 @@
 
 #### **Alumno 2 - Daniel Vela Quimbay**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He participado en las diferentes tareas de la práctica aportando la detección de 3 issues de calidad, varias pruebas unitarias, al refactorización de los issues  encontrados, dos casos de TDD y dos prueba de sistema web con Selenium para comprobar la funcionalidad de transferencias.
 
 | Nº    | Commits      |
 |:------------: |:------------:|
 |1| [Issue detectada 1](https://github.com/revyalo/ais-2026-grupo-z/commit/03aeb214e948c135283c1b2f164ceddbe4cb2f9b)<br>[Issue detectada 2 y 3](https://github.com/revyalo/ais-2026-grupo-z/commit/c4c74e97c3355a8e0ab95d366d184bc3c058c9ac) |  
 |2| [Prueba unitaria implementada](https://github.com/revyalo/ais-2026-grupo-z/commit/54d910afc9fbf36f1e394275a2cfbce84885c9a4)  |
-|3| [Refactorización implementada](https://github.com/revyalo/ais-2026-grupo-z/blob/main/ANALISIS_CALIDAD_2.md)  |
+|3| [Refactorización implementada](https://github.com/revyalo/ais-2026-grupo-z/commit/144182f941ef3f621dc26fe9df38ac6fcdf45942)  |
 |4| [Caso de TDD implementado](https://github.com/revyalo/ais-2026-grupo-z/commit/9147cafd0413f61686cdb2d98623f1be879c7ddf)  |
 |5| [Prueba de sistema implementada](https://github.com/revyalo/ais-2026-grupo-z/commit/29c849ed0a901961ea47964b8dc11435f84f00d5)  |
 
