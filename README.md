@@ -43,7 +43,8 @@ He participado en las diferentes tareas de la práctica aportando la detección 
 
 #### **Alumno 3 - Ricardo Ullco Lagla**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He participado en las diferentes tareas de la práctica aportando la detección de 2 issues de calidad y su posterior refactorizacion, 3 pruebas unitarias, dos casos de 
+TDD y dos prueba de sistema web con Selenium para comprobar la funcionalidad de transferencias
 
 | Nº    | Commits      |
 |:------------: |:------------:|
