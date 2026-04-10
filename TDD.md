@@ -110,8 +110,6 @@ Hemos añadido otra condicion adicional para verificar si es mayor al valor esti
 
 
 ### Se rechaza el pago si es menor del plazo de 6 meses
-
-
 **Código de test**
 ```java
     @Test
