@@ -65,24 +65,24 @@ public class TransferE2ETest {
     @Test
     @DisplayName("Error por cantidad negativa")
     public void testNegativeTransfer(){
-        try_transfer("-50", "ES0001234568", "Amount must be positive");
+        try_transfer("-50", "ES0001234568", "Amount must be positive","ES0001234567");
     }
 
     @Test
     @DisplayName("Error por limite de 20.000€ superado")
     public void testGT20K(){
-        try_transfer("25000", "ES0001234568", "Amount exceeds maximum transfer limit");
+        try_transfer("25000", "ES0001234568", "Amount exceeds maximum transfer limit","ES0001234567");
     }
 
     @Test
     @DisplayName("Error por saldo insuficiente")
     public void testNotEnought(){
-        try_transfer("16000", "ES0001234568", "Insufficient funds");
+        try_transfer("16000", "ES0001234568", "Insufficient funds","ES0001234567");
     }
 
 
 
-    private void try_transfer(String value, String to, String message){
+    private void try_transfer(String value, String to, String message,String from){
         driver.get("http://localhost:" + this.port + "/transfer");
 
         WebElement fromAccount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fromAccount")));
@@ -91,7 +91,7 @@ public class TransferE2ETest {
         WebElement transferButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("transferButton")));
 
         Select sourceSelect = new Select(fromAccount);
-        sourceSelect.selectByIndex(1);
+        sourceSelect.selectByValue(from);
         String initialAccount = sourceSelect.getFirstSelectedOption().getText();
 
         toAccount.clear();
@@ -105,7 +105,8 @@ public class TransferE2ETest {
         assertTrue(error.getText().contains(message), "No es coincidente el mensaje de error: " + error.getText());
 
         Select sourceSelectEnd = new Select(driver.findElement(By.id("fromAccount")));
-        String accountText = sourceSelectEnd.getOptions().get(1).getText();
+        sourceSelectEnd.selectByValue(from);
+        String accountText = sourceSelectEnd.getFirstSelectedOption().getText();
 
         assertEquals(initialAccount, accountText, "El saldo no debe cambiar");
 
@@ -186,6 +187,16 @@ public class TransferE2ETest {
         double finalBalanceTo = Double.parseDouble(balanceTo.getText());
         assertEquals(8500.0, finalBalanceTo, "Saldo destino debe ser 8500");
     }
+    @Test
+    @DisplayName("No se puede transferir a la misma cuenta")
+    public void testTransferToSameAccountError() {
+        try_transfer("100", "ES0001234567", "Cannot transfer to same account", "ES0001234567");
+    }
 
+    @Test
+    @DisplayName("No se puede transferir a cuenta invalida o que no existe")
+    public void testTransferToInvalidAccountError() {
+        try_transfer("100", "ES9999999999", "Account not found", "ES0001234567");
+    }
     
 }

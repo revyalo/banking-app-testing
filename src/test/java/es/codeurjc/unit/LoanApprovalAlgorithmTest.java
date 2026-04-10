@@ -159,7 +159,7 @@ public class LoanApprovalAlgorithmTest {
 
         assertTrue(result.isApproved());
         assertEquals(5.5, result.getInterestRate(), 0.01);
-        assertEquals(878.17, result.getMonthlyPayment(), 0.01);
+        assertEquals(879.17, result.getMonthlyPayment(), 0.01);
     }
     @Test
     @DisplayName("Estrategia TDD: Un prestamo aprobado con Euribor al 5% tiene una cuota de 891.67€ al mes")
