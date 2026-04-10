@@ -110,5 +110,82 @@ public class TransferE2ETest {
         assertEquals(initialAccount, accountText, "El saldo no debe cambiar");
 
     }
+    @Test
+    @DisplayName("Transferencia entre cuentas propias")
+    public void testTransferBetweenOwnAccounts() {
+        driver.get("http://localhost:" + this.port + "/transfer");
+
+        WebElement fromAccount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fromAccount")));
+        WebElement toAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("toAccount")));
+        WebElement amount = wait.until(ExpectedConditions.elementToBeClickable(By.id("amount")));
+        WebElement transferButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("transferButton")));
+
+        Select sourceSelect = new Select(fromAccount);
+        sourceSelect.selectByValue("ES0001234567");
+
+        toAccount.clear();
+        toAccount.sendKeys("ES0001234568");
+
+        amount.clear();
+        amount.sendKeys("1000");
+
+        transferButton.click();
+
+        // Esperar a que redirija al dashboard
+        wait.until(ExpectedConditions.urlContains("/dashboard"));
+
+        WebElement balanceFrom = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0001234567")));
+        WebElement balanceTo = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0001234568")));
+
+        assertEquals("4000.0", balanceFrom.getText(), "Saldo origen debe ser 4000");
+        assertEquals("16000.0", balanceTo.getText(), "Saldo destino debe ser 16000");
+    }
+    @Test
+    @DisplayName("Transferencia exitosa entre cuentas de distintos usuarios")
+    public void testTransferBetweenDifferentUsers() {
+        // Ir al dashboard para ver saldo inicial
+        driver.get("http://localhost:" + this.port + "/dashboard");
+        WebElement balanceFromBefore = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0001234567")));
+        double initialBalanceFrom = Double.parseDouble(balanceFromBefore.getText());
+
+        // Ir a transfer
+        driver.get("http://localhost:" + this.port + "/transfer");
+
+        WebElement fromAccount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fromAccount")));
+        WebElement toAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("toAccount")));
+        WebElement amount = wait.until(ExpectedConditions.elementToBeClickable(By.id("amount")));
+        WebElement transferButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("transferButton")));
+
+        Select sourceSelect = new Select(fromAccount);
+        sourceSelect.selectByValue("ES0001234567");
+
+        toAccount.clear();
+        toAccount.sendKeys("ES0002345678");
+
+        amount.clear();
+        amount.sendKeys("500");
+
+        transferButton.click();
+
+        // Verificar saldo origen en dashboard
+        wait.until(ExpectedConditions.urlContains("/dashboard"));
+        WebElement balanceFromAfter = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0001234567")));
+        double finalBalanceFrom = Double.parseDouble(balanceFromAfter.getText());
+        assertEquals(initialBalanceFrom - 500, finalBalanceFrom, "Saldo origen debe reducirse en 500");
+
+        // Logout y login como maria para verificar saldo destino
+        driver.get("http://localhost:" + this.port + "/logout");
+        driver.get("http://localhost:" + this.port + "/login");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("maria");
+        driver.findElement(By.id("password")).sendKeys("maria123");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        wait.until(ExpectedConditions.urlContains("/dashboard"));
+        WebElement balanceTo = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0002345678")));
+        double finalBalanceTo = Double.parseDouble(balanceTo.getText());
+        assertEquals(8500.0, finalBalanceTo, "Saldo destino debe ser 8500");
+    }
+
     
 }
