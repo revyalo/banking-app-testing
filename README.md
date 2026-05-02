@@ -15,10 +15,206 @@
 
 | Tarea | David Arévalo Rey | Daniel Vela Quimbay | Ricardo Ullco Lagla |
 |---|---|---|---|
-| **Tarea 1 - Preparación del repositorio** | Preparó la rama `p2-tarea1-preparacion-repositorio`, corrigió la configuración de Surefire eliminando la línea problemática de `argLine`, añadió la propiedad `app.version`, creó `AppVersionControllerAdvice` y modificó el login para mostrar la versión de la aplicación. <br><br>Commits: [9a06487](https://github.com/revyalo/ais-2026-grupo-z/commit/9a06487), [6bc10d6](https://github.com/revyalo/ais-2026-grupo-z/commit/6bc10d6). <br>Merge: [6eac54e](https://github.com/revyalo/ais-2026-grupo-z/commit/6eac54ebe8b6b4be4c05d2f6a5f00250d0371ed5). | Revisó los cambios realizados en la Tarea 1 mediante el Pull Request y comprobó que el proyecto seguía funcionando correctamente tras la integración. <br><br>Evidencia: [merge Tarea 1](https://github.com/revyalo/ais-2026-grupo-z/commit/6eac54ebe8b6b4be4c05d2f6a5f00250d0371ed5). | Revisó los cambios realizados en la Tarea 1 mediante el Pull Request y comprobó que la versión de la aplicación se mostraba correctamente en el login. <br><br>Evidencia: [merge Tarea 1](https://github.com/revyalo/ais-2026-grupo-z/commit/6eac54ebe8b6b4be4c05d2f6a5f00250d0371ed5). |
-| **Tarea 2 - Definición de workflows** | Pendiente. | Pendiente. | Pendiente. |
-| **Tarea 3 - Desarrollo colaborativo con GitHubFlow** | Pendiente. | Pendiente. | Pendiente. |
-| **Tarea 4 - Realización de la memoria** | Pendiente. | Pendiente. | Pendiente. |
+| **Tarea 1 - Preparación del repositorio** | Preparó la rama `p2-tarea1-preparacion-repositorio`, corrigió la configuración de Maven/Surefire eliminando la línea problemática de `argLine`, añadió la propiedad `app.version`, creó `AppVersionControllerAdvice` y modificó el login para mostrar la versión de la aplicación. <br><br>Commits: [9a06487](https://github.com/revyalo/ais-2026-grupo-z/commit/9a06487), [6bc10d6](https://github.com/revyalo/ais-2026-grupo-z/commit/6bc10d6). <br>Merge: [6eac54e](https://github.com/revyalo/ais-2026-grupo-z/commit/6eac54ebe8b6b4be4c05d2f6a5f00250d0371ed5). | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
+| **Tarea 2 - Definición de workflows** | Añadió workflows de GitHub Actions para automatizar la ejecución de pruebas en ramas y Pull Requests. Creó el workflow de pruebas unitarias en ramas y el workflow de pruebas automáticas para Pull Requests. <br><br>Commits: [d6586e8](https://github.com/revyalo/ais-2026-grupo-z/commit/d6586e8), [e4cc6ee](https://github.com/revyalo/ais-2026-grupo-z/commit/e4cc6ee). | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
+| **Tarea 3 - Desarrollo colaborativo con GitHubFlow** | Implementó la rama `feature-2`, correspondiente a impedir operaciones de usuarios bloqueados. Añadió el atributo `banned` en la entidad `User`, incorporó validaciones en `AccountService`, añadió pruebas unitarias para usuarios bloqueados y actualizó la versión de la aplicación a `1.1.0`. <br><br>Pull Request: [PR #5 - Tarea 3: impedir operaciones de usuarios bloqueados](https://github.com/revyalo/ais-2026-grupo-z/pull/5). <br>Commit principal: [0cb1931](https://github.com/revyalo/ais-2026-grupo-z/commit/0cb1931). | Pendiente de completar `feature-1`. | Pendiente de completar la parte asignada por el grupo. |
+| **Tarea 4 - Realización de la memoria** | Actualizó la memoria en `README.md` documentando la parte realizada: preparación del repositorio, workflows iniciales, rama `feature-2`, Pull Requests, comandos Git utilizados y evidencias de ejecución. | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
+
+---
+
+## Desarrollo con GitHubFlow
+
+### Asignación de tareas
+
+Durante la práctica se ha seguido un flujo de trabajo basado en GitHubFlow. Cada funcionalidad o tarea se ha desarrollado en una rama independiente creada a partir de `main`. Después, los cambios se han integrado mediante Pull Requests revisados y validados con workflows de GitHub Actions.
+
+| Tarea | Responsable | Estado |
+|---|---|---|
+| Tarea 1 - Preparación del repositorio | David Arévalo Rey | Completada |
+| Tarea 2 - Workflows de pruebas en ramas y Pull Requests | David Arévalo Rey | Completada |
+| Tarea 3 - Feature 2: impedir operaciones de usuarios bloqueados | David Arévalo Rey | Completada |
+| Tarea 3 - Feature 1 | Pendiente de otro integrante | Pendiente |
+| Workflows restantes / despliegue / nightly | Pendiente de otros integrantes | Pendiente |
+| Tarea 4 - Memoria | Grupo Z | En proceso |
+
+### Pasos seguidos
+
+#### 1. Actualización de la rama principal
+
+Antes de comenzar cada tarea se actualizó la rama `main` para partir siempre de la última versión del proyecto:
+```bash
+git checkout main
+git pull origin main
+```
+
+Git checkout main para cambiar a la rama `main` del repositorio
+Git pull origin main descarga e integra los ultimos cambios de Github
+
+#### 2. Ramas de trabajo
+
+Para la tarea 1:
+```bash
+git checkout -b p2-tarea1-preparacion-repositorio
+```
+
+Para la tarea 2:
+```bash
+git checkout -b p2-tarea2-workflows
+git checkout -b p2-tarea2-pr-workflow
+```
+
+Para la tarea 3 en la funcionalidad feature-2:
+```bash
+git checkout -b feature-2
+```
+El comando git checkout -b crea una nueva rama y cambia automaticamente a ella
+
+#### 3. Comprobacion de cambios
+Durante el desarrollo se uso la siguiete funcion para comprobar el estado del repo
+
+```bash
+git status
+```
+Permite ver la rama actual, ficheros actualizados, los nuevos y si hay cambios pendientes de commit.
+
+#### 4. Ejecución de pruebas en local.
+Antes de subir los cambios se ejecutaron las pruebas con Maven
+
+```bash
+mvn clean test
+```
+
+Limpia el directorio, recompila el proyecto y ejecuta las pruebas automaticas
+
+En la rama feature-2, hubo un problema con las pruebas unitarias devido al formato de los mensajes, que se soluciono corredctamente.
+
+#### 5. Preparacion de commits
+Una vez realizado unos cambios se añadieron los ficheros modificados
+```bash
+git add pom.xml
+git add src/main/java/es/codeurjc/model/User.java
+git add src/main/java/es/codeurjc/service/AccountService.java
+git add src/test/java/es/codeurjc/unit/AccountServiceTest.java```
+```
+
+El comando git add indica que ficheros se incluiran en el siguiente commit.
+Despues se crearia el siguiente commit correspondiente:
+
+```bash
+git commit -m "Tarea 3: impedir operaciones de usuarios bloqueados"
+```
+El comando git commit guarda los cambios en el historial local del repositorio
+
+#### 6. Subida de la rama al repositorio remoto
+Despues de crear el commit, se subio la rama a Github
+```bash
+git push origin feature-2
+```
+Publicamos la rama local feature-2 en el repositorio remoto
+
+#### 7. Creación y revision del Pull Request
+Con la rama subida a GitHub, se crea su Pull Request correspondiente:
+
+[PR #5 - Tarea 3: impedir operaciones de usuarios bloqueados](https://github.com/revyalo/ais-2026-grupo-z/pull/5)
+En este Pull Request se ejecutaron los workflows configurados para validar automáticamente los cambios. Finalmente, los checks aparecieron en verde, por lo que la rama quedó lista para revisión e integración.
+
+## Cambios realizados en `feature-2`
+
+La rama `feature-2` implementa la funcionalidad para impedir operaciones bancarias a usuarios bloqueados.
+
+### Cambios en `User`
+
+Se añadió el atributo `banned` a la entidad `User`:
+
+```Java
+    private boolean banned = false;
+```
+
+También se añadieron sus métodos de acceso:
+
+
+```Java
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
+```
+    
+Este atributo permite marcar a un usuario como bloqueado.
+
+### Cambios en `AccountService`
+
+Se añadió una validación para comprobar si el usuario propietario de una cuenta está bloqueado antes de permitir operaciones bancarias.
+
+La validación se aplica en operaciones como:
+
+- Ingresos.
+- Retiradas.
+- Transferencias desde una cuenta origen.
+- Transferencias hacia una cuenta destino.
+
+Si el usuario está bloqueado, se lanza una excepción y no se realiza la operación.
+
+### Cambios en pruebas unitarias
+
+Se añadieron pruebas unitarias en `AccountServiceTest` para comprobar que no se permiten operaciones con usuarios bloqueados:
+
+- No permite ingresar dinero si el usuario está bloqueado.
+- No permite retirar dinero si el usuario está bloqueado.
+- No permite transferir dinero si el usuario origen está bloqueado.
+- No permite transferir dinero si el usuario destino está bloqueado.
+
+Además, se corrigieron las comprobaciones de mensajes de notificación para adaptarlas al formato decimal utilizado por el servicio.
+
+### Cambio de versión
+
+Se actualizó la versión de la aplicación en `pom.xml`:
+
+    <version>1.1.0</version>
+
+## Workflows de GitHub Actions
+
+### Workflow de pruebas en ramas
+
+Se añadió un workflow para ejecutar pruebas automáticamente al trabajar con ramas de desarrollo.
+
+Evidencia: [Commit workflow ramas](https://github.com/revyalo/ais-2026-grupo-z/commit/d6586e8)
+
+Este workflow permite detectar errores antes de abrir o integrar cambios en `main`.
+
+### Workflow de Pull Requests
+
+Se añadió un workflow que se ejecuta al abrir o actualizar un Pull Request.
+
+Evidencia: [Commit workflow Pull Requests](https://github.com/revyalo/ais-2026-grupo-z/commit/e4cc6ee)
+
+En el caso de la rama `feature-2`, el Pull Request asociado ejecutó correctamente los checks:
+
+[PR #5 - Tarea 3: impedir operaciones de usuarios bloqueados](https://github.com/revyalo/ais-2026-grupo-z/pull/5)
+
+## Despliegue en Azure
+
+Pendiente de completar por el miembro encargado del despliegue.
+
+Cuando el despliegue esté realizado se añadirá:
+
+- Captura de pantalla de la aplicación desplegada en Azure.
+- Captura de pantalla del dashboard de Azure con la última versión desplegada.
+- URL pública de la aplicación desplegada.
+
+## Workflow de Nightly
+
+Pendiente de completar por el miembro encargado del workflow de Nightly.
+
+En esta sección se documentará:
+
+- Cuándo se lanza el workflow.
+- Qué tareas realiza.
+- Enlace a la última ejecución.
+- Enlaces a los artefactos generados.
 
 ### **Participación de Miembros en la Práctica 1**
 
