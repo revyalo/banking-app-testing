@@ -1,3 +1,59 @@
+# Práctica 2 - Implementación de pipelines de CI/CD y desarrollo colaborativo
+
+## Grupo Z
+
+## Miembros del Equipo
+
+| Nombre y Apellidos | Correo URJC | Usuario GitHub |
+|---|---|---|
+| David Arévalo Rey | d.arevalo.2023@alumnos.urjc.es | revyalo |
+| Daniel Vela Quimbay | d.vela.2023@alumnos.urjc.es | danivequi |
+| Ricardo Ullco Lagla | r.ullco.2023@alumnos.urjc.es | ullco4833-rgb |
+
+---
+
+## Participación de Miembros en la Práctica 2
+
+### Alumno 1 - David Arévalo Rey
+
+He participado en las diferentes tareas de la práctica aportando la preparación inicial del repositorio, la corrección de la configuración de Maven para permitir la ejecución correcta de las pruebas, la visualización de la versión de la aplicación en la pantalla de login, escribir mas
+
+| Nº | Aportación | Commits / Enlaces |
+|---|---|---|
+| 1 | Preparación del repositorio para la Práctica 2 | [9a06487](https://github.com/revyalo/ais-2026-grupo-z/commit/9a06487) |
+| 2 | Visualización de la versión de la aplicación en el login | [6bc10d6](https://github.com/revyalo/ais-2026-grupo-z/commit/6bc10d6) |
+| 3 | Workflow de pruebas unitarias en ramas distintas de `main` | [PONER_COMMIT](PONER_ENLACE) |
+| 4 | Participación en `feature-1` o `feature-2` usando GitHubFlow | [PONER_COMMIT](PONER_ENLACE) |
+| 5 | Documentación de comandos, Pull Requests y evidencias en el README | [PONER_COMMIT](PONER_ENLACE) |
+
+---
+
+### Alumno 2 - Daniel Vela Quimbay
+
+
+
+| Nº | Aportación | Commits / Enlaces |
+|---|---|---|
+| 1 | Revisión de la preparación inicial del repositorio | [PONER_COMMIT_O_PR](PONER_ENLACE) |
+| 2 | Workflow de pruebas en Pull Request hacia `main` | [PONER_COMMIT](PONER_ENLACE) |
+| 3 | Participación en `feature-2`: atributo `banned` y restricciones de operaciones | [PONER_COMMIT](PONER_ENLACE) |
+| 4 | Pruebas unitarias asociadas a una funcionalidad de la Práctica 2 | [PONER_COMMIT](PONER_ENLACE) |
+| 5 | Documentación de workflows, Pull Requests y resultados en el README | [PONER_COMMIT](PONER_ENLACE) |
+
+---
+
+### Alumno 3 - Ricardo Ullco Lagla
+
+--
+
+| Nº | Aportación | Commits / Enlaces |
+|---|---|---|
+| 1 | Revisión de la preparación inicial del repositorio | [PONER_COMMIT_O_PR](PONER_ENLACE) |
+| 2 | Workflow de despliegue en producción con DockerHub y Azure | [PONER_COMMIT](PONER_ENLACE) |
+| 3 | Workflow nightly con pruebas de sistema en distintos navegadores/SO | [PONER_COMMIT](PONER_ENLACE) |
+| 4 | Participación en `feature-1`: límite de retirada en las últimas 24 horas | [PONER_COMMIT](PONER_ENLACE) |
+| 5 | Documentación de DockerHub, Azure, capturas y artefactos generados | [PONER_COMMIT](PONER_ENLACE) |
+
 # Praćtica 1 - Control de calidad de una aplicación web 
 
 **Grupo Z**
@@ -15,7 +71,7 @@
 
 #### **Alumno 1 - David Arévalo Rey**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He participado en las diferentes tareas de la practica, preparando el repositorio para evitar conflictos futuros, la apotacion de diferenctes detecciones de calidad con diferentes herramientas, su respectiva refactorizacion, la creacion de varias pruebas unitarias, dos casos TDD y dos pruebas de Selenium 
 
 | Nº    | Commits      |
 |:------------: |:------------:|
