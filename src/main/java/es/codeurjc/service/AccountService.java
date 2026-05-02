@@ -84,6 +84,7 @@ public class AccountService {
         validateDepositeAmount(amount);
 
         Account account = getAccount(accountNumber);
+        validateUserNotBanned(account);
         account.deposit(amount);
 
         // Record transaction
@@ -122,6 +123,7 @@ public class AccountService {
         }
 
         Account account = getAccount(accountNumber);
+        validateUserNotBanned(account);
 
         // Check balance
         if (account.getBalance() < amount) {
@@ -165,6 +167,9 @@ public class AccountService {
 
         Account sourceAccount = getAccount(fromAccountNumber);
         Account destinationAccount = getAccount(toAccountNumber);
+
+        validateUserNotBanned(sourceAccount);
+        validateUserNotBanned(destinationAccount);
 
         // Validate same account
         validateDifferentAccounts(sourceAccount, destinationAccount);
@@ -214,6 +219,12 @@ public class AccountService {
     public List<Transaction> getTransactions(String accountNumber) {
         Account account = getAccount(accountNumber);
         return transactionRepository.findByAccountOrderByTimestampDesc(account);
+    }
+
+    private void validateUserNotBanned(Account account) {
+        if (account.getUser() != null && account.getUser().isBanned()) {
+            throw new IllegalArgumentException("User is banned");
+        }
     }
 
     private void sendNotificationByPreference(User user,Notification.NotificationType notificationType, String emailSubject, String smsSubject, String emailMessage, String smsMessage){
