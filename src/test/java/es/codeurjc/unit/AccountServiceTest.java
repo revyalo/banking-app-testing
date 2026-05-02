@@ -177,7 +177,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200,00"));
+        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200.00"));
 
         verifyNoInteractions(smsService);
     }
@@ -200,7 +200,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200,00"));
+        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200.00"));
 
         verifyNoInteractions(emailService);
     }
@@ -276,7 +276,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal Confirmation"), contains("200,00"));
+        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal Confirmation"), contains("200.00"));
 
         verifyNoInteractions(smsService);
     }
@@ -299,7 +299,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal"), contains("200,00"));
+        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal"), contains("200.00"));
 
         verifyNoInteractions(emailService);
     }
@@ -346,4 +346,73 @@ public class AccountServiceTest {
 
         assertThatThrownBy(() -> accountService.getAccount("cuenta")).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Account not found");
     }
+
+    @Test
+    @DisplayName("No permite ingresar dinero si el usuario esta bloqueado")
+    void deposit_withBannedUser_throwsException() {
+        User user = new User();
+        user.setBanned(true);
+
+        Account account = new Account("cuenta", Account.AccountType.CHECKING, 1000.0);
+        account.setUser(user);
+
+        when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
+
+        assertThatThrownBy(() -> accountService.deposit("cuenta", 100.0, "Ingreso"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User is banned");
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+        verifyNoInteractions(emailService, smsService);
+    }
+
+    @Test
+    @DisplayName("No permite retirar dinero si el usuario esta bloqueado")
+    void withdraw_withBannedUser_throwsException() {
+        User user = new User();
+        user.setBanned(true);
+
+        Account account = new Account("cuenta", Account.AccountType.CHECKING, 1000.0);
+        account.setUser(user);
+
+        when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
+
+        assertThatThrownBy(() -> accountService.withdraw("cuenta", 100.0, "Retirada"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User is banned");
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+        verifyNoInteractions(emailService, smsService);
+    }
+
+    @Test
+    @DisplayName("No permite transferir dinero si el usuario origen esta bloqueado")
+    void transfer_withBannedSourceUser_throwsException() {
+        User bannedUser = new User();
+        bannedUser.setBanned(true);
+
+        User destinationUser = new User();
+        destinationUser.setNotificationType(User.NotificationType.EMAIL);
+
+        Account accountFrom = new Account("ES123", Account.AccountType.CHECKING, 1000.0);
+        accountFrom.setUser(bannedUser);
+
+        Account accountTo = new Account("ES664", Account.AccountType.SAVINGS, 500.0);
+        accountTo.setUser(destinationUser);
+
+        when(accountRepository.findByAccountNumber("ES123")).thenReturn(Optional.of(accountFrom));
+        when(accountRepository.findByAccountNumber("ES664")).thenReturn(Optional.of(accountTo));
+
+        assertThatThrownBy(() -> accountService.transfer("ES123", "ES664", 200.0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User is banned");
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+        verifyNoInteractions(emailService, smsService);
+    }
+
+
 }
