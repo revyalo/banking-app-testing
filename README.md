@@ -17,8 +17,8 @@
 |---|---|---|---|
 | **Tarea 1 - Preparación del repositorio** | Preparó la rama `p2-tarea1-preparacion-repositorio`, corrigió la configuración de Maven/Surefire eliminando la línea problemática de `argLine`, añadió la propiedad `app.version`, creó `AppVersionControllerAdvice` y modificó el login para mostrar la versión de la aplicación. <br><br>Commits: [9a06487](https://github.com/revyalo/ais-2026-grupo-z/commit/9a06487), [6bc10d6](https://github.com/revyalo/ais-2026-grupo-z/commit/6bc10d6). <br>Merge: [6eac54e](https://github.com/revyalo/ais-2026-grupo-z/commit/6eac54ebe8b6b4be4c05d2f6a5f00250d0371ed5). | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
 | **Tarea 2 - Definición de workflows** | Añadió workflows de GitHub Actions para automatizar la ejecución de pruebas en ramas y Pull Requests. Creó el workflow de pruebas unitarias en ramas y el workflow de pruebas automáticas para Pull Requests. <br><br>Commits: [d6586e8](https://github.com/revyalo/ais-2026-grupo-z/commit/d6586e8), [e4cc6ee](https://github.com/revyalo/ais-2026-grupo-z/commit/e4cc6ee). | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
-| **Tarea 3 - Desarrollo colaborativo con GitHubFlow** | Implementó la rama `feature-2`, correspondiente a impedir operaciones de usuarios bloqueados. Añadió el atributo `banned` en la entidad `User`, incorporó validaciones en `AccountService`, añadió pruebas unitarias para usuarios bloqueados y actualizó la versión de la aplicación a `1.1.0`. <br><br>Pull Request: [PR #5 - Tarea 3: impedir operaciones de usuarios bloqueados](https://github.com/revyalo/ais-2026-grupo-z/pull/5). <br>Commit principal: [0cb1931](https://github.com/revyalo/ais-2026-grupo-z/commit/0cb1931). | Pendiente de completar `feature-1`. | Pendiente de completar la parte asignada por el grupo. |
-| **Tarea 4 - Realización de la memoria** | Actualizó la memoria en `README.md` documentando la parte realizada: preparación del repositorio, workflows iniciales, rama `feature-2`, Pull Requests, comandos Git utilizados y evidencias de ejecución. | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
+| **Tarea 3 - Desarrollo colaborativo con GitHubFlow** | Implementó la rama `feature-2`, correspondiente a impedir operaciones de usuarios bloqueados. Añadió el atributo `banned` en la entidad `User`, incorporó validaciones en `AccountService`, añadió pruebas unitarias para usuarios bloqueados y actualizó la versión de la aplicación a `1.1.0`. <br><br>Pull Request: [PR #5 - Tarea 3: impedir operaciones de usuarios bloqueados](https://github.com/revyalo/ais-2026-grupo-z/pull/5). <br>Commit principal: [0cb1931](https://github.com/revyalo/ais-2026-grupo-z/commit/0cb1931). | Implementó la rama `feature-1`, correspondiente a limitar las retiradas acumuladas en las últimas 24 horas. Añadió la validación en `AccountService`, incorporó pruebas unitarias para cubrir la regla de negocio y actualizó la versión de la aplicación a `1.2.0`. <br><br>Pull Request: [PR #6 - Tarea 3: limitar retiradas en 24 horas](https://github.com/revyalo/ais-2026-grupo-z/pull/6). <br>Commits: [40a80fc](https://github.com/revyalo/ais-2026-grupo-z/commit/40a80fcf76363a3970db7a18741dae73e5426c10), [1fd8bb6](https://github.com/revyalo/ais-2026-grupo-z/commit/1fd8bb6c221e68116d0ad936bca3171e5861f8ab), [9165668](https://github.com/revyalo/ais-2026-grupo-z/commit/9165668e5bf39b9fe6ab69b1573c55db70146175), [988519b](https://github.com/revyalo/ais-2026-grupo-z/commit/988519b209cd44bec8c067400d5b070cfcd8e3a9), [b725f3b](https://github.com/revyalo/ais-2026-grupo-z/commit/b725f3bf7bedb1e1b6e78125715e03d893a94cab). <br>Merge: [20645b5](https://github.com/revyalo/ais-2026-grupo-z/commit/20645b5a1be4fcf4be93e595592e7ed3cdd45c41). | Pendiente de completar la parte asignada por el grupo. |
+| **Tarea 4 - Realización de la memoria** | Actualizó la memoria en `README.md` documentando la parte realizada: preparación del repositorio, workflows iniciales, rama `feature-2`, Pull Requests, comandos Git utilizados y evidencias de ejecución. | Actualizó la memoria en `README.md` documentando su participación en `feature-1`, el Pull Request asociado, los commits realizados, las pruebas ejecutadas, la versión `1.2.0` y la evidencia del workflow en verde. | Pendiente de completar por el miembro correspondiente. |
 
 ---
 
@@ -33,7 +33,7 @@ Durante la práctica se ha seguido un flujo de trabajo basado en GitHubFlow. Cad
 | Tarea 1 - Preparación del repositorio | David Arévalo Rey | Completada |
 | Tarea 2 - Workflows de pruebas en ramas y Pull Requests | David Arévalo Rey | Completada |
 | Tarea 3 - Feature 2: impedir operaciones de usuarios bloqueados | David Arévalo Rey | Completada |
-| Tarea 3 - Feature 1 | Pendiente de otro integrante | Pendiente |
+| Tarea 3 - Feature 1: limitar retiradas acumuladas en 24 horas | Daniel Vela Quimbay | Completada |
 | Workflows restantes / despliegue / nightly | Pendiente de otros integrantes | Pendiente |
 | Tarea 4 - Memoria | Grupo Z | En proceso |
 
@@ -66,6 +66,11 @@ git checkout -b p2-tarea2-pr-workflow
 Para la tarea 3 en la funcionalidad feature-2:
 ```bash
 git checkout -b feature-2
+```
+
+Para la tarea 3 en la funcionalidad feature-1:
+```bash
+git checkout -b feature-1
 ```
 El comando git checkout -b crea una nueva rama y cambia automaticamente a ella
 
@@ -117,6 +122,60 @@ Con la rama subida a GitHub, se crea su Pull Request correspondiente:
 
 [PR #5 - Tarea 3: impedir operaciones de usuarios bloqueados](https://github.com/revyalo/ais-2026-grupo-z/pull/5)
 En este Pull Request se ejecutaron los workflows configurados para validar automáticamente los cambios. Finalmente, los checks aparecieron en verde, por lo que la rama quedó lista para revisión e integración.
+
+Para la rama `feature-1`, Daniel Vela Quimbay abrió el Pull Request correspondiente:
+
+[PR #6 - Tarea 3: limitar retiradas en 24 horas](https://github.com/revyalo/ais-2026-grupo-z/pull/6)
+
+En este Pull Request se validó la funcionalidad con los workflows de GitHub Actions. La rama no presentaba conflictos con `main` y los checks aparecieron en verde antes de realizar el merge.
+
+## Cambios realizados en `feature-1`
+
+La rama `feature-1` fue implementada por Daniel Vela Quimbay y añade una regla de negocio para limitar las retiradas acumuladas de una cuenta durante las últimas 24 horas.
+
+### Funcionalidad implementada
+
+Se modificó `AccountService` para validar las retiradas antes de modificar el saldo de la cuenta.
+
+La regla implementada establece que una cuenta no puede retirar una cantidad que, sumada a lo retirado durante las últimas 24 horas, sea igual o superior a `5000`.
+
+Si el total acumulado durante las últimas 24 horas más la nueva retirada solicitada es igual o superior a `5000`, la operación se cancela y el saldo no se modifica.
+
+### Pruebas añadidas
+
+Se añadieron pruebas unitarias en `AccountServiceTest` para comprobar:
+
+- Que se permite una retirada si el total acumulado durante las últimas 24 horas es menor que `5000`.
+- Que se rechaza una retirada si el total acumulado supera `5000`.
+- Que se rechaza una retirada si el total acumulado es exactamente `5000`.
+- Que no se cuentan retiradas anteriores a 24 horas.
+- Que el saldo no cambia cuando la retirada se cancela.
+
+Además, se corrigieron comprobaciones de mensajes de notificación para que los tests no dependan del formato decimal usado por el entorno de ejecución.
+
+### Cambio de versión
+
+Se actualizó la versión de la aplicación en `pom.xml`:
+
+    <version>1.2.0</version>
+
+Este cambio identifica la incorporación de la nueva funcionalidad `feature-1`.
+
+### Pull Request y commits
+
+Pull Request: [PR #6 - Tarea 3: limitar retiradas en 24 horas](https://github.com/revyalo/ais-2026-grupo-z/pull/6)
+
+Commits de la rama `feature-1`:
+
+- `40a80fcf76363a3970db7a18741dae73e5426c10` - limitar retiradas en 24 horas.
+- `1fd8bb6c221e68116d0ad936bca3171e5861f8ab` - añadir pruebas para límite de retiradas.
+- `9165668e5bf39b9fe6ab69b1573c55db70146175` - Bump version to 1.2.0.
+- `988519b209cd44bec8c067400d5b070cfcd8e3a9` - test error.
+- `b725f3bf7bedb1e1b6e78125715e03d893a94cab` - solucion test.
+
+Merge final en `main`:
+
+- `20645b5a1be4fcf4be93e595592e7ed3cdd45c41` - Merge pull request #6 from revyalo/feature-1.
 
 ## Cambios realizados en `feature-2`
 
