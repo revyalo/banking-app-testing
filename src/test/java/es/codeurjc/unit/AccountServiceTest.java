@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -177,7 +178,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200.00"));
+        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(smsService);
     }
@@ -200,7 +201,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200.00"));
+        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(emailService);
     }
@@ -276,7 +277,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal Confirmation"), contains("200.00"));
+        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal Confirmation"), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(smsService);
     }
@@ -299,9 +300,109 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal"), contains("200.00"));
+        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal"), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(emailService);
+    }
+
+    @Test
+    @DisplayName("Permite retirar si el acumulado en 24 horas es menor que 5000")
+    void withdraw_withAccumulatedAmountBelowLimit_allowsWithdrawal() {
+        User user = new User();
+        user.setNotificationType(User.NotificationType.EMAIL);
+
+        Account account = new Account("cuenta", Account.AccountType.CHECKING, 10000.0);
+        account.setUser(user);
+
+        when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
+        when(transactionRepository.findByAccount(account)).thenReturn(List.of(
+                withdrawal(account, 2000.0, LocalDateTime.now().minusHours(3)),
+                withdrawal(account, 1000.0, LocalDateTime.now().minusHours(2))
+        ));
+        when(accountRepository.save(account)).thenReturn(account);
+
+        Account result = accountService.withdraw("cuenta", 1000.0, "Cajero");
+
+        assertThat(result.getBalance()).isEqualTo(9000.0);
+        verify(transactionRepository).save(any(Transaction.class));
+        verify(accountRepository).save(account);
+    }
+
+    @Test
+    @DisplayName("Rechaza retirada si el acumulado en 24 horas supera 5000")
+    void withdraw_withAccumulatedAmountOverLimit_rejectsWithdrawal() {
+        Account account = accountWithEmailUser(10000.0);
+
+        when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
+        when(transactionRepository.findByAccount(account)).thenReturn(List.of(
+                withdrawal(account, 4500.0, LocalDateTime.now().minusHours(1))
+        ));
+
+        assertThatThrownBy(() -> accountService.withdraw("cuenta", 600.0, "Cajero"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Withdrawal limit exceeded in the last 24 hours");
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+    }
+
+    @Test
+    @DisplayName("Rechaza retirada si el acumulado en 24 horas es exactamente 5000")
+    void withdraw_withAccumulatedAmountExactlyLimit_rejectsWithdrawal() {
+        Account account = accountWithEmailUser(10000.0);
+
+        when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
+        when(transactionRepository.findByAccount(account)).thenReturn(List.of(
+                withdrawal(account, 4000.0, LocalDateTime.now().minusHours(1))
+        ));
+
+        assertThatThrownBy(() -> accountService.withdraw("cuenta", 1000.0, "Cajero"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Withdrawal limit exceeded in the last 24 hours");
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+    }
+
+    @Test
+    @DisplayName("No cuenta retiradas anteriores a las ultimas 24 horas")
+    void withdraw_ignoresWithdrawalsOlderThan24Hours() {
+        User user = new User();
+        user.setNotificationType(User.NotificationType.EMAIL);
+
+        Account account = new Account("cuenta", Account.AccountType.CHECKING, 10000.0);
+        account.setUser(user);
+
+        when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
+        when(transactionRepository.findByAccount(account)).thenReturn(List.of(
+                withdrawal(account, 4900.0, LocalDateTime.now().minusHours(25))
+        ));
+        when(accountRepository.save(account)).thenReturn(account);
+
+        Account result = accountService.withdraw("cuenta", 1000.0, "Cajero");
+
+        assertThat(result.getBalance()).isEqualTo(9000.0);
+        verify(transactionRepository).save(any(Transaction.class));
+        verify(accountRepository).save(account);
+    }
+
+    @Test
+    @DisplayName("No cambia el saldo si la retirada se cancela por limite de 24 horas")
+    void withdraw_whenLimitExceeded_keepsBalanceUnchanged() {
+        Account account = accountWithEmailUser(10000.0);
+
+        when(accountRepository.findByAccountNumber("cuenta")).thenReturn(Optional.of(account));
+        when(transactionRepository.findByAccount(account)).thenReturn(List.of(
+                withdrawal(account, 4500.0, LocalDateTime.now().minusHours(1))
+        ));
+
+        assertThatThrownBy(() -> accountService.withdraw("cuenta", 600.0, "Cajero"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Withdrawal limit exceeded in the last 24 hours");
+
+        assertThat(account.getBalance()).isEqualTo(10000.0);
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
     }
 
     @Test
@@ -412,6 +513,21 @@ public class AccountServiceTest {
         verify(accountRepository, never()).save(any(Account.class));
         verify(transactionRepository, never()).save(any(Transaction.class));
         verifyNoInteractions(emailService, smsService);
+    }
+
+    private Account accountWithEmailUser(double balance) {
+        User user = new User();
+        user.setNotificationType(User.NotificationType.EMAIL);
+
+        Account account = new Account("cuenta", Account.AccountType.CHECKING, balance);
+        account.setUser(user);
+        return account;
+    }
+
+    private Transaction withdrawal(Account account, double amount, LocalDateTime timestamp) {
+        Transaction transaction = new Transaction(account, Transaction.TransactionType.WITHDRAWAL, amount, "Withdrawal");
+        transaction.setTimestamp(timestamp);
+        return transaction;
     }
 
 

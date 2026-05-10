@@ -12,6 +12,7 @@ import es.codeurjc.service.notifications.SmsNotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -124,6 +125,7 @@ public class AccountService {
 
         Account account = getAccount(accountNumber);
         validateUserNotBanned(account);
+        validateWithdrawalLimitLast24Hours(account, amount);
 
         // Check balance
         if (account.getBalance() < amount) {
@@ -245,6 +247,21 @@ public class AccountService {
             throw new IllegalArgumentException("Amount exceeds maximum transfer limit");
         }
     }
+
+    private void validateWithdrawalLimitLast24Hours(Account account, double amount) {
+        LocalDateTime last24Hours = LocalDateTime.now().minusHours(24);
+        double withdrawnLast24Hours = transactionRepository.findByAccount(account).stream()
+                .filter(transaction -> transaction.getType() == Transaction.TransactionType.WITHDRAWAL)
+                .filter(transaction -> transaction.getTimestamp() != null)
+                .filter(transaction -> !transaction.getTimestamp().isBefore(last24Hours))
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+
+        if (withdrawnLast24Hours + amount >= MAX_WITHDRAW) {
+            throw new IllegalArgumentException("Withdrawal limit exceeded in the last 24 hours");
+        }
+    }
+
     private void validateDifferentAccounts(Account sourceAccount, Account destinationAccount) {
         if (sourceAccount.getAccountNumber().equals(destinationAccount.getAccountNumber())) {
             throw new IllegalArgumentException("Cannot transfer to same account");
