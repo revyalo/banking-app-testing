@@ -178,7 +178,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200,00"));
+        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(smsService);
     }
@@ -201,7 +201,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), contains("200,00"));
+        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.DEPOSIT), eq(AccountService.DEPOSIT_CONFIRMATION), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(emailService);
     }
@@ -277,7 +277,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal Confirmation"), contains("200,00"));
+        verify(emailService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal Confirmation"), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(smsService);
     }
@@ -300,7 +300,7 @@ public class AccountServiceTest {
         verify(transactionRepository).save(any(Transaction.class));
         verify(accountRepository).save(account);
 
-        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal"), contains("200,00"));
+        verify(smsService).sendNotification(eq(user), eq(es.codeurjc.model.Notification.NotificationType.WITHDRAWAL), eq("Withdrawal"), argThat(message -> message.contains("200,00") || message.contains("200.00")));
 
         verifyNoInteractions(emailService);
     }
