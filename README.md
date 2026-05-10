@@ -16,7 +16,7 @@
 | Tarea | David Arévalo Rey | Daniel Vela Quimbay | Ricardo Ullco Lagla |
 |---|---|---|---|
 | **Tarea 1 - Preparación del repositorio** | Preparó la rama `p2-tarea1-preparacion-repositorio`, corrigió la configuración de Maven/Surefire eliminando la línea problemática de `argLine`, añadió la propiedad `app.version`, creó `AppVersionControllerAdvice` y modificó el login para mostrar la versión de la aplicación. <br><br>Commits: [9a06487](https://github.com/revyalo/ais-2026-grupo-z/commit/9a06487), [6bc10d6](https://github.com/revyalo/ais-2026-grupo-z/commit/6bc10d6). <br>Merge: [6eac54e](https://github.com/revyalo/ais-2026-grupo-z/commit/6eac54ebe8b6b4be4c05d2f6a5f00250d0371ed5). | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
-| **Tarea 2 - Definición de workflows** | Añadió workflows de GitHub Actions para automatizar la ejecución de pruebas en ramas y Pull Requests. Creó el workflow de pruebas unitarias en ramas y el workflow de pruebas automáticas para Pull Requests. <br><br>Commits: [d6586e8](https://github.com/revyalo/ais-2026-grupo-z/commit/d6586e8), [e4cc6ee](https://github.com/revyalo/ais-2026-grupo-z/commit/e4cc6ee). | Pendiente de completar por el miembro correspondiente. | Pendiente de completar por el miembro correspondiente. |
+| **Tarea 2 - Definición de workflows** | Añadió workflows de GitHub Actions para automatizar la ejecución de pruebas en ramas y Pull Requests. Creó el workflow de pruebas unitarias en ramas y el workflow de pruebas automáticas para Pull Requests. <br><br>Commits: [d6586e8](https://github.com/revyalo/ais-2026-grupo-z/commit/d6586e8), [e4cc6ee](https://github.com/revyalo/ais-2026-grupo-z/commit/e4cc6ee). | Añadió el workflow Nightly para ejecutar pruebas de sistema en varios navegadores y sistemas operativos. También preparó la prueba `TransferE2ETest` para seleccionar navegador mediante propiedad de Maven y añadió la construcción de una imagen Docker guardada como artefacto. <br><br>Commits: [166c26f](https://github.com/revyalo/ais-2026-grupo-z/commit/166c26f8e0576b9beaf777bcf42db8fc4d3c68be), [d95fc7e](https://github.com/revyalo/ais-2026-grupo-z/commit/d95fc7e28d933fcb83c87d71fa5ac6e4b6160734). <br>Pull Request: PR #X - URL_DEL_PR_NIGHTLY. | Pendiente de completar por el miembro correspondiente. |
 | **Tarea 3 - Desarrollo colaborativo con GitHubFlow** | Implementó la rama `feature-2`, correspondiente a impedir operaciones de usuarios bloqueados. Añadió el atributo `banned` en la entidad `User`, incorporó validaciones en `AccountService`, añadió pruebas unitarias para usuarios bloqueados y actualizó la versión de la aplicación a `1.1.0`. <br><br>Pull Request: [PR #5 - Tarea 3: impedir operaciones de usuarios bloqueados](https://github.com/revyalo/ais-2026-grupo-z/pull/5). <br>Commit principal: [0cb1931](https://github.com/revyalo/ais-2026-grupo-z/commit/0cb1931). | Implementó la rama `feature-1`, correspondiente a limitar las retiradas acumuladas en las últimas 24 horas. Añadió la validación en `AccountService`, incorporó pruebas unitarias para cubrir la regla de negocio y actualizó la versión de la aplicación a `1.2.0`. <br><br>Pull Request: [PR #6 - Tarea 3: limitar retiradas en 24 horas](https://github.com/revyalo/ais-2026-grupo-z/pull/6). <br>Commits: [40a80fc](https://github.com/revyalo/ais-2026-grupo-z/commit/40a80fcf76363a3970db7a18741dae73e5426c10), [1fd8bb6](https://github.com/revyalo/ais-2026-grupo-z/commit/1fd8bb6c221e68116d0ad936bca3171e5861f8ab), [9165668](https://github.com/revyalo/ais-2026-grupo-z/commit/9165668e5bf39b9fe6ab69b1573c55db70146175), [988519b](https://github.com/revyalo/ais-2026-grupo-z/commit/988519b209cd44bec8c067400d5b070cfcd8e3a9), [b725f3b](https://github.com/revyalo/ais-2026-grupo-z/commit/b725f3bf7bedb1e1b6e78125715e03d893a94cab). <br>Merge: [20645b5](https://github.com/revyalo/ais-2026-grupo-z/commit/20645b5a1be4fcf4be93e595592e7ed3cdd45c41). | Pendiente de completar la parte asignada por el grupo. |
 | **Tarea 4 - Realización de la memoria** | Actualizó la memoria en `README.md` documentando la parte realizada: preparación del repositorio, workflows iniciales, rama `feature-2`, Pull Requests, comandos Git utilizados y evidencias de ejecución. | Actualizó la memoria en `README.md` documentando su participación en `feature-1`, el Pull Request asociado, los commits realizados, las pruebas ejecutadas, la versión `1.2.0` y la evidencia del workflow en verde. | Pendiente de completar por el miembro correspondiente. |
 
@@ -32,9 +32,9 @@ Durante la práctica se ha seguido un flujo de trabajo basado en GitHubFlow. Cad
 |---|---|---|
 | Tarea 1 - Preparación del repositorio | David Arévalo Rey | Completada |
 | Tarea 2 - Workflows de pruebas en ramas y Pull Requests | David Arévalo Rey | Completada |
+| Tarea 2 - Workflow Nightly | Daniel Vela Quimbay | Completada |
 | Tarea 3 - Feature 2: impedir operaciones de usuarios bloqueados | David Arévalo Rey | Completada |
 | Tarea 3 - Feature 1: limitar retiradas acumuladas en 24 horas | Daniel Vela Quimbay | Completada |
-| Workflows restantes / despliegue / nightly | Pendiente de otros integrantes | Pendiente |
 | Tarea 4 - Memoria | Grupo Z | En proceso |
 
 ### Pasos seguidos
@@ -61,6 +61,11 @@ Para la tarea 2:
 ```bash
 git checkout -b p2-tarea2-workflows
 git checkout -b p2-tarea2-pr-workflow
+```
+
+Para el workflow Nightly:
+```bash
+git checkout -b workflow-nightly
 ```
 
 Para la tarea 3 en la funcionalidad feature-2:
@@ -266,14 +271,78 @@ Cuando el despliegue esté realizado se añadirá:
 
 ## Workflow de Nightly
 
-Pendiente de completar por el miembro encargado del workflow de Nightly.
+Daniel Vela Quimbay implementó el workflow Nightly en la rama `workflow-nightly`.
 
-En esta sección se documentará:
+El workflow se encuentra en:
 
-- Cuándo se lanza el workflow.
-- Qué tareas realiza.
-- Enlace a la última ejecución.
-- Enlaces a los artefactos generados.
+```text
+.github/workflows/nightly.yml
+```
+
+### Ejecución del workflow
+
+El workflow Nightly se ejecuta automáticamente cada noche sobre la rama `main` mediante la siguiente planificación:
+
+```yaml
+cron: "0 2 * * *"
+```
+
+También puede lanzarse manualmente desde GitHub Actions mediante `workflow_dispatch`.
+
+### Pruebas de sistema
+
+El workflow ejecuta la prueba de sistema `TransferE2ETest`, que comprueba transferencias bancarias desde la interfaz web de la aplicación.
+
+Para permitir la ejecución en distintos navegadores, se adaptó `TransferE2ETest` para seleccionar el navegador mediante la propiedad de Maven `browser`:
+
+```bash
+mvn test -Dtest=TransferE2ETest -Dbrowser=chrome
+mvn test -Dtest=TransferE2ETest -Dbrowser=firefox
+mvn test -Dtest=TransferE2ETest -Dbrowser=edge
+mvn test -Dtest=TransferE2ETest -Dbrowser=safari
+```
+
+La matriz del workflow ejecuta la prueba en las siguientes combinaciones:
+
+- Chrome en `ubuntu-latest`.
+- Firefox en `ubuntu-latest`.
+- Chrome en `windows-latest`.
+- Firefox en `windows-latest`.
+- Edge en `windows-latest`.
+- Chrome en `macos-latest`.
+- Firefox en `macos-latest`.
+- Safari en `macos-latest`.
+
+Safari se ejecuta únicamente en macOS y requiere habilitar `safaridriver` antes de lanzar la prueba.
+
+### Artefacto Docker Nightly
+
+Si todas las pruebas de sistema pasan correctamente, el workflow construye una imagen Docker local de la aplicación:
+
+```bash
+docker build -t banking-app:nightly-fecha .
+```
+
+La imagen se guarda como archivo `.tar` mediante `docker save` y se sube como artefacto del workflow con un nombre de tipo:
+
+```text
+banking-app-nightly-YYYYMMDD
+```
+
+Este artefacto permite conservar la imagen generada por la ejecución Nightly sin publicarla en DockerHub.
+
+### Evidencias
+
+Pull Request: PR #X - URL_DEL_PR_NIGHTLY.
+
+Commits principales:
+
+- `166c26f8e0576b9beaf777bcf42db8fc4d3c68be` - Permite seleccionar navegador para la prueba.
+- `d95fc7e28d933fcb83c87d71fa5ac6e4b6160734` - añadir workflow nightly.
+
+Última ejecución del workflow en verde: URL_EJECUCION_NIGHTLY.
+
+Artefacto generado: URL_ARTEFACTO_NIGHTLY.
 
 ### **Participación de Miembros en la Práctica 1**
 
