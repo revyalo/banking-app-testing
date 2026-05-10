@@ -38,11 +38,11 @@ public class TransferE2ETest {
         driver = createDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        driver.get("http://localHost:" + this.port + "/login");
+        driver.get(baseUrl("/login"));
         driver.findElement(By.id("username")).sendKeys("customer");
         driver.findElement(By.id("password")).sendKeys("Cu5t0m3r");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
-
+        wait.until(ExpectedConditions.urlContains("/dashboard"));
     }
 
     private WebDriver createDriver() {
@@ -118,6 +118,10 @@ public class TransferE2ETest {
         return Path.of(System.getProperty("java.io.tmpdir"), browser + "-test-profile-" + System.nanoTime()).toString();
     }
 
+    private String baseUrl(String path) {
+        return "http://localhost:" + this.port + path;
+    }
+
     @AfterEach
     public void tearDown(){
         if (driver != null){
@@ -146,7 +150,7 @@ public class TransferE2ETest {
 
 
     private void try_transfer(String value, String to, String message,String from){
-        driver.get("http://localhost:" + this.port + "/transfer");
+        driver.get(baseUrl("/transfer"));
 
         WebElement fromAccount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fromAccount")));
         WebElement toAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("toAccount")));
@@ -177,7 +181,7 @@ public class TransferE2ETest {
     @Test
     @DisplayName("Transferencia entre cuentas propias")
     public void testTransferBetweenOwnAccounts() {
-        driver.get("http://localhost:" + this.port + "/transfer");
+        driver.get(baseUrl("/transfer"));
 
         WebElement fromAccount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fromAccount")));
         WebElement toAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("toAccount")));
@@ -208,12 +212,12 @@ public class TransferE2ETest {
     @DisplayName("Transferencia exitosa entre cuentas de distintos usuarios")
     public void testTransferBetweenDifferentUsers() {
         // Ir al dashboard para ver saldo inicial
-        driver.get("http://localhost:" + this.port + "/dashboard");
+        driver.get(baseUrl("/dashboard"));
         WebElement balanceFromBefore = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0001234567")));
         double initialBalanceFrom = Double.parseDouble(balanceFromBefore.getText());
 
         // Ir a transfer
-        driver.get("http://localhost:" + this.port + "/transfer");
+        driver.get(baseUrl("/transfer"));
 
         WebElement fromAccount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fromAccount")));
         WebElement toAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("toAccount")));
@@ -238,8 +242,8 @@ public class TransferE2ETest {
         assertEquals(initialBalanceFrom - 500, finalBalanceFrom, "Saldo origen debe reducirse en 500");
 
         // Logout y login como maria para verificar saldo destino
-        driver.get("http://localhost:" + this.port + "/logout");
-        driver.get("http://localhost:" + this.port + "/login");
+        driver.get(baseUrl("/logout"));
+        driver.get(baseUrl("/login"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("maria");
         driver.findElement(By.id("password")).sendKeys("maria123");
