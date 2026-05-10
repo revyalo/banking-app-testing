@@ -6,7 +6,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -14,6 +18,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
 
@@ -30,6 +35,29 @@ public class TransferE2ETest {
     private WebDriverWait wait;
     @BeforeEach
     public void setUp(){
+        driver = createDriver();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        driver.get("http://localHost:" + this.port + "/login");
+        driver.findElement(By.id("username")).sendKeys("customer");
+        driver.findElement(By.id("password")).sendKeys("Cu5t0m3r");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+    }
+
+    private WebDriver createDriver() {
+        String browser = System.getProperty("browser", "chrome").toLowerCase();
+
+        return switch (browser) {
+            case "chrome" -> new ChromeDriver(chromeOptions());
+            case "firefox" -> new FirefoxDriver(firefoxOptions());
+            case "edge" -> new EdgeDriver(edgeOptions());
+            case "safari" -> new SafariDriver();
+            default -> throw new IllegalArgumentException("Unsupported browser: " + browser);
+        };
+    }
+
+    private ChromeOptions chromeOptions() {
         ChromeOptions options = new ChromeOptions();
 
         options.addArguments("--headless=new");
@@ -38,7 +66,7 @@ public class TransferE2ETest {
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
 
-        options.addArguments("user-data-dir=/tmp/chrome-test-profile");
+        options.addArguments("user-data-dir=" + browserProfilePath("chrome"));
         options.addArguments("--disable-save-password-bubble");
         options.addArguments("--disable-notifications");
         options.addArguments("--disable-popup-blocking");
@@ -51,14 +79,43 @@ public class TransferE2ETest {
 
         //Todo este codigo se aplica debido a un pop-up de chrome que no permitia dejar avanzar y bloquear el programa
 
-        driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        return options;
+    }
 
-        driver.get("http://localHost:" + this.port + "/login");
-        driver.findElement(By.id("username")).sendKeys("customer");
-        driver.findElement(By.id("password")).sendKeys("Cu5t0m3r");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+    private FirefoxOptions firefoxOptions() {
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("-headless");
+        options.addArguments("--width=1920");
+        options.addArguments("--height=1080");
+        options.addPreference("signon.rememberSignons", false);
+        return options;
+    }
 
+    private EdgeOptions edgeOptions() {
+        EdgeOptions options = new EdgeOptions();
+
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+
+        options.addArguments("user-data-dir=" + browserProfilePath("edge"));
+        options.addArguments("--disable-save-password-bubble");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--incognito");
+
+        options.setExperimentalOption("prefs", Map.of("credentials_enable_service", false,
+                "profile.password_manager_enabled", false,
+                "autofill.profile_enable", false,
+        "autofill.credit_card_enabled", false));
+
+        return options;
+    }
+
+    private String browserProfilePath(String browser) {
+        return Path.of(System.getProperty("java.io.tmpdir"), browser + "-test-profile-" + System.nanoTime()).toString();
     }
 
     @AfterEach
