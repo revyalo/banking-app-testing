@@ -1,0 +1,75 @@
+name: Nightly system tests and Docker artifact
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  system-tests:
+    name: System tests - ${{ matrix.os }} - ${{ matrix.browser }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            browser: chrome
+          - os: ubuntu-latest
+            browser: firefox
+          - os: windows-latest
+            browser: chrome
+          - os: windows-latest
+            browser: firefox
+          - os: windows-latest
+            browser: edge
+          - os: macos-latest
+            browser: chrome
+          - os: macos-latest
+            browser: firefox
+          - os: macos-latest
+            browser: safari
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Enable Safari driver
+        if: matrix.browser == 'safari'
+        run: sudo safaridriver --enable
+
+      - name: Run system tests
+        run: mvn test "-Dtest=TransferE2ETest" "-Dbrowser=${{ matrix.browser }}"
+
+  docker-artifact:
+    name: Build Docker nightly artifact
+    runs-on: ubuntu-latest
+    needs: system-tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate nightly tag
+        id: nightly
+        run: echo "tag=nightly-$(date +'%Y%m%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image
+        run: docker build -t banking-app:${{ steps.nightly.outputs.tag }} .
+
+      - name: Save Docker image as artifact
+        run: docker save banking-app:${{ steps.nightly.outputs.tag }} -o banking-app-${{ steps.nightly.outputs.tag }}.tar
+
+      - name: Upload Docker artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: banking-app-${{ steps.nightly.outputs.tag }}
+          path: banking-app-${{ steps.nightly.outputs.tag }}.tar
