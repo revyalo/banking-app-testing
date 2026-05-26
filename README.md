@@ -357,6 +357,8 @@ Pull Request: [PR #7 - Añadir Workflow nightly](https://github.com/revyalo/ais-
 
 Workflow en GitHub Actions: [Nightly system tests and Docker artifact](https://github.com/revyalo/ais-2026-grupo-z/actions/workflows/nightly.yml).
 
+![Ejecución correcta del workflow Nightly](img/nightly.png)
+
 Commits principales:
 
 - `166c26f8e0576b9beaf777bcf42db8fc4d3c68be` - Permite seleccionar navegador para la prueba.
