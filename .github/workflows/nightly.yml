@@ -33,6 +33,8 @@ jobs:
             browser: chrome
           - os: macos-latest
             browser: firefox
+          - os: macos-latest
+            browser: safari
 
     steps:
       - name: Checkout repository
@@ -92,5 +94,5 @@ jobs:
         with:
           name: banking-app-${{ steps.nightly.outputs.tag }}
           path: banking-app-${{ steps.nightly.outputs.tag }}.tar.gz
-          retention-days: 1
+          retention-days: 14
           compression-level: 0
