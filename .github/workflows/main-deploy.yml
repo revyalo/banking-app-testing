@@ -57,7 +57,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: banking-app-production
+          app-name: bankingapp-production-urjc
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: ${{ secrets.DOCKERHUB_USERNAME }}/banking-app:${{ needs.publish-docker.outputs.version }}
 
@@ -79,4 +79,4 @@ jobs:
         run: sleep 30
 
       - name: Run Smoke Test
-        run: mvn test -Dtest=SmokeTest -DappVersion=${{ needs.publish-docker.outputs.version }} -DappUrl=https://banking-app-production.azurewebsites.net
+        run: mvn test -Dtest=SmokeTest -DappVersion=${{ needs.publish-docker.outputs.version }} -DappUrl=https://bankingapp-production-urjc-bhbcebcag5cte5e4.spaincentral-01.azurewebsites.net

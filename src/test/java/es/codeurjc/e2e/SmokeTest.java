@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SmokeTest {
 
     private WebDriver driver;
-    private static final String DEFAULT_APP_URL = "https://banking-app-production.azurewebsites.net";
+    private static final String DEFAULT_APP_URL = "https://bankingapp-production-urjc-bhbcebcag5cte5e4.spaincentral-01.azurewebsites.net";
 
     @BeforeEach
     public void setUp() {
