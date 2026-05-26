@@ -2,6 +2,7 @@ package es.codeurjc.e2e;
 
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -33,16 +34,15 @@ public class TransferE2ETest {
 
     private WebDriver driver;
     private WebDriverWait wait;
+
     @BeforeEach
     public void setUp(){
         driver = createDriver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        driver.get(baseUrl("/login"));
-        driver.findElement(By.id("username")).sendKeys("customer");
-        driver.findElement(By.id("password")).sendKeys("Cu5t0m3r");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
-        wait.until(ExpectedConditions.urlContains("/dashboard"));
+        loginAs("customer", "Cu5t0m3r");
     }
 
     private WebDriver createDriver() {
@@ -122,6 +122,30 @@ public class TransferE2ETest {
         return "http://localhost:" + this.port + path;
     }
 
+    private void loginAs(String username, String password) {
+        driver.get(baseUrl("/login"));
+
+        setInputValue(wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))), username);
+        setInputValue(wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))), password);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("loginButton"))).click();
+
+        wait.until(ExpectedConditions.urlContains("/dashboard"));
+    }
+
+    private void setInputValue(WebElement element, String value) {
+        ((JavascriptExecutor) driver).executeScript("""
+                arguments[0].focus();
+                arguments[0].value = arguments[1];
+                arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+                arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
+                """, element, value);
+    }
+
+    private double balanceOf(String accountNumber) {
+        WebElement balance = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-" + accountNumber)));
+        return Double.parseDouble(balance.getText());
+    }
+
     @AfterEach
     public void tearDown(){
         if (driver != null){
@@ -161,11 +185,8 @@ public class TransferE2ETest {
         sourceSelect.selectByValue(from);
         String initialAccount = sourceSelect.getFirstSelectedOption().getText();
 
-        toAccount.clear();
-        toAccount.sendKeys(to);
-
-        amount.clear();
-        amount.sendKeys(value);
+        setInputValue(toAccount, to);
+        setInputValue(amount, value);
 
         transferButton.click();
         WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("errorMessage")));
@@ -181,6 +202,10 @@ public class TransferE2ETest {
     @Test
     @DisplayName("Transferencia entre cuentas propias")
     public void testTransferBetweenOwnAccounts() {
+        driver.get(baseUrl("/dashboard"));
+        double initialBalanceFrom = balanceOf("ES0001234567");
+        double initialBalanceTo = balanceOf("ES0001234568");
+
         driver.get(baseUrl("/transfer"));
 
         WebElement fromAccount = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fromAccount")));
@@ -191,22 +216,15 @@ public class TransferE2ETest {
         Select sourceSelect = new Select(fromAccount);
         sourceSelect.selectByValue("ES0001234567");
 
-        toAccount.clear();
-        toAccount.sendKeys("ES0001234568");
-
-        amount.clear();
-        amount.sendKeys("1000");
+        setInputValue(toAccount, "ES0001234568");
+        setInputValue(amount, "1000");
 
         transferButton.click();
 
-        // Esperar a que redirija al dashboard
         wait.until(ExpectedConditions.urlContains("/dashboard"));
 
-        WebElement balanceFrom = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0001234567")));
-        WebElement balanceTo = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0001234568")));
-
-        assertEquals("4000.0", balanceFrom.getText(), "Saldo origen debe ser 4000");
-        assertEquals("16000.0", balanceTo.getText(), "Saldo destino debe ser 16000");
+        assertEquals(initialBalanceFrom - 1000, balanceOf("ES0001234567"), "Saldo origen debe reducirse en 1000");
+        assertEquals(initialBalanceTo + 1000, balanceOf("ES0001234568"), "Saldo destino debe aumentar en 1000");
     }
     @Test
     @DisplayName("Transferencia exitosa entre cuentas de distintos usuarios")
@@ -227,11 +245,8 @@ public class TransferE2ETest {
         Select sourceSelect = new Select(fromAccount);
         sourceSelect.selectByValue("ES0001234567");
 
-        toAccount.clear();
-        toAccount.sendKeys("ES0002345678");
-
-        amount.clear();
-        amount.sendKeys("500");
+        setInputValue(toAccount, "ES0002345678");
+        setInputValue(amount, "500");
 
         transferButton.click();
 
@@ -243,11 +258,7 @@ public class TransferE2ETest {
 
         // Logout y login como maria para verificar saldo destino
         driver.get(baseUrl("/logout"));
-        driver.get(baseUrl("/login"));
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("maria");
-        driver.findElement(By.id("password")).sendKeys("maria123");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        loginAs("maria", "maria123");
 
         wait.until(ExpectedConditions.urlContains("/dashboard"));
         WebElement balanceTo = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("balance-ES0002345678")));

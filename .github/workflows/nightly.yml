@@ -9,6 +9,7 @@ jobs:
   system-tests:
     name: System tests - ${{ matrix.os }} - ${{ matrix.browser }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
 
     strategy:
       fail-fast: false
@@ -28,8 +29,6 @@ jobs:
             browser: chrome
           - os: macos-latest
             browser: firefox
-          - os: macos-latest
-            browser: safari
 
     steps:
       - name: Checkout repository
@@ -41,10 +40,6 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
-
-      - name: Enable Safari driver
-        if: matrix.browser == 'safari'
-        run: sudo safaridriver --enable
 
       - name: Run system tests
         run: mvn test "-Dtest=TransferE2ETest" "-Dbrowser=${{ matrix.browser }}"

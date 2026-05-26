@@ -321,7 +321,6 @@ Para permitir la ejecución en distintos navegadores, se adaptó `TransferE2ETes
 mvn test -Dtest=TransferE2ETest -Dbrowser=chrome
 mvn test -Dtest=TransferE2ETest -Dbrowser=firefox
 mvn test -Dtest=TransferE2ETest -Dbrowser=edge
-mvn test -Dtest=TransferE2ETest -Dbrowser=safari
 ```
 
 La matriz del workflow ejecuta la prueba en las siguientes combinaciones:
@@ -333,9 +332,8 @@ La matriz del workflow ejecuta la prueba en las siguientes combinaciones:
 - Edge en `windows-latest`.
 - Chrome en `macos-latest`.
 - Firefox en `macos-latest`.
-- Safari en `macos-latest`.
 
-Safari se ejecuta únicamente en macOS y requiere habilitar `safaridriver` antes de lanzar la prueba.
+La matriz cubre los tres sistemas operativos de GitHub Actions y los navegadores Chrome, Firefox y Edge. Safari no se incluye en la matriz estable porque `SafariDriver` en los runners compartidos de macOS puede dejar sesiones WebDriver bloqueadas y provocar fallos ajenos a la funcionalidad de la aplicación.
 
 ### Artefacto Docker Nightly
 
