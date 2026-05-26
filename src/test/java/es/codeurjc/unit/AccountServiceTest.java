@@ -515,6 +515,35 @@ public class AccountServiceTest {
         verifyNoInteractions(emailService, smsService);
     }
 
+    @Test
+    @DisplayName("No permite recibir dinero si el usuario destino esta bloqueado")
+    void transfer_withBannedDestinationUser_throwsException() {
+        User sourceUser = new User();
+        sourceUser.setNotificationType(User.NotificationType.EMAIL);
+
+        User bannedDestinationUser = new User();
+        bannedDestinationUser.setBanned(true);
+
+        Account accountFrom = new Account("ES123", Account.AccountType.CHECKING, 1000.0);
+        accountFrom.setUser(sourceUser);
+
+        Account accountTo = new Account("ES664", Account.AccountType.SAVINGS, 500.0);
+        accountTo.setUser(bannedDestinationUser);
+
+        when(accountRepository.findByAccountNumber("ES123")).thenReturn(Optional.of(accountFrom));
+        when(accountRepository.findByAccountNumber("ES664")).thenReturn(Optional.of(accountTo));
+
+        assertThatThrownBy(() -> accountService.transfer("ES123", "ES664", 200.0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User is banned");
+
+        assertThat(accountFrom.getBalance()).isEqualTo(1000.0);
+        assertThat(accountTo.getBalance()).isEqualTo(500.0);
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+        verifyNoInteractions(emailService, smsService);
+    }
+
     private Account accountWithEmailUser(double balance) {
         User user = new User();
         user.setNotificationType(User.NotificationType.EMAIL);
