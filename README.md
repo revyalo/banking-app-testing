@@ -349,7 +349,7 @@ La imagen se guarda como archivo `.tar.gz` mediante `docker save` y `gzip`, y se
 banking-app-nightly-YYYYMMDD
 ```
 
-Antes de subir el artefacto, el workflow elimina artefactos Nightly anteriores para evitar saturar la cuota de almacenamiento de GitHub Actions. El artefacto se conserva durante 1 día, suficiente para descargarlo o capturarlo como evidencia de la ejecución.
+Antes de subir el artefacto, el workflow elimina artefactos Nightly anteriores para evitar saturar la cuota de almacenamiento de GitHub Actions. El artefacto se conserva durante 14 día, suficiente para descargarlo o capturarlo como evidencia de la ejecución.
 
 ### Evidencias
 
@@ -367,6 +367,10 @@ Commits principales:
 Última ejecución del workflow en verde: [Nightly system tests and Docker artifact](https://github.com/revyalo/ais-2026-grupo-z/actions/workflows/nightly.yml). Desde esa página se accede a la ejecución más reciente y a sus artefactos.
 
 Artefacto generado por una ejecución correcta: `banking-app-nightly-YYYYMMDD`, disponible en la sección **Artifacts** de la ejecución del workflow.
+
+Recientemente hemos encontrado un conflicto, debido a que el docker no puede generarse correctamente, debido al limite de almacenamiento de Actions, aunque los workflows funcionan correctamente
+
+![Conflicto con almacenamiento](img/LimiteAlmacenamiento.png)
 
 ### **Participación de Miembros en la Práctica 1**
 
