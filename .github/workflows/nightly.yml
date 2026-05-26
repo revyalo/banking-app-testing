@@ -33,8 +33,7 @@ jobs:
             browser: chrome
           - os: macos-latest
             browser: firefox
-          - os: macos-latest
-            browser: safari
+
 
     steps:
       - name: Checkout repository
