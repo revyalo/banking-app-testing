@@ -343,13 +343,13 @@ Si todas las pruebas de sistema pasan correctamente, el workflow construye una i
 docker build -t banking-app:nightly-fecha .
 ```
 
-La imagen se guarda como archivo `.tar` mediante `docker save` y se sube como artefacto del workflow con un nombre de tipo:
+La imagen se guarda como archivo `.tar.gz` mediante `docker save` y `gzip`, y se sube como artefacto del workflow con un nombre de tipo:
 
 ```text
 banking-app-nightly-YYYYMMDD
 ```
 
-Este artefacto permite conservar la imagen generada por la ejecución Nightly sin publicarla en DockerHub.
+Antes de subir el artefacto, el workflow elimina artefactos Nightly anteriores para evitar saturar la cuota de almacenamiento de GitHub Actions. El artefacto se conserva durante 1 día, suficiente para descargarlo o capturarlo como evidencia de la ejecución.
 
 ### Evidencias
 

@@ -5,6 +5,10 @@ on:
     - cron: "0 2 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   system-tests:
     name: System tests - ${{ matrix.os }} - ${{ matrix.browser }}
@@ -57,14 +61,36 @@ jobs:
         id: nightly
         run: echo "tag=nightly-$(date +'%Y%m%d')" >> "$GITHUB_OUTPUT"
 
+      - name: Delete previous nightly artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+
+            for (const artifact of artifacts) {
+              if (artifact.name.startsWith("banking-app-nightly-")) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id
+                });
+              }
+            }
+
       - name: Build Docker image
         run: docker build -t banking-app:${{ steps.nightly.outputs.tag }} .
 
-      - name: Save Docker image as artifact
-        run: docker save banking-app:${{ steps.nightly.outputs.tag }} -o banking-app-${{ steps.nightly.outputs.tag }}.tar
+      - name: Save compressed Docker image as artifact
+        run: docker save banking-app:${{ steps.nightly.outputs.tag }} | gzip > banking-app-${{ steps.nightly.outputs.tag }}.tar.gz
 
       - name: Upload Docker artifact
         uses: actions/upload-artifact@v4
         with:
           name: banking-app-${{ steps.nightly.outputs.tag }}
-          path: banking-app-${{ steps.nightly.outputs.tag }}.tar
+          path: banking-app-${{ steps.nightly.outputs.tag }}.tar.gz
+          retention-days: 1
+          compression-level: 0
