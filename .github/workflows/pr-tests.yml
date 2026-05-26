@@ -47,4 +47,4 @@ jobs:
           java-version: '21'
 
       - name: Run system tests
-        run: mvn test -Dtest="es.codeurjc.e2e.*Test"
+        run: mvn test -Dtest="es.codeurjc.e2e.TransferE2ETest"

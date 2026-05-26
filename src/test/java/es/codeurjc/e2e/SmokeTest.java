@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SmokeTest {
 
     private WebDriver driver;
-    private static final String APP_URL = "https://bankingapp-production-urjc-bhbcebcag5cte5e4.spaincentral-01.azurewebsites.net";
+    private static final String DEFAULT_APP_URL = "https://banking-app-production.azurewebsites.net";
 
     @BeforeEach
     public void setUp() {
@@ -27,8 +27,9 @@ public class SmokeTest {
     @Test
     public void testVersionIsCorrect() {
         String expectedVersion = System.getProperty("appVersion", "1.2.0");
+        String appUrl = System.getProperty("appUrl", DEFAULT_APP_URL);
 
-        driver.get(APP_URL + "/login");
+        driver.get(appUrl + "/login");
 
         String pageSource = driver.getPageSource();
         assertTrue(pageSource.contains(expectedVersion),
